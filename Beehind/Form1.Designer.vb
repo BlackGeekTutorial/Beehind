@@ -28,14 +28,17 @@ Partial Class Form1
         Me.AboutBeehindToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FollowMeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DonationsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.OriginalXPWNSourceToolStripMenuItem = New System.Windows.Forms.ToolStripSeparator()
+        Me.SeeXPWNOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SelectModeMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.IPSWCreatorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.KloaderModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RestoreModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.IdevicerestoreModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CreditsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.OriginalXPWNSourceToolStripMenuItem = New System.Windows.Forms.ToolStripSeparator()
-        Me.SeeXPWNOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.SeeBeehindOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BeehindMenuStrip.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -50,7 +53,7 @@ Partial Class Form1
         '
         'InfoMenuItem
         '
-        Me.InfoMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutBeehindToolStripMenuItem, Me.FollowMeToolStripMenuItem, Me.DonationsToolStripMenuItem, Me.OriginalXPWNSourceToolStripMenuItem, Me.SeeXPWNOnGitHubToolStripMenuItem})
+        Me.InfoMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutBeehindToolStripMenuItem, Me.FollowMeToolStripMenuItem, Me.DonationsToolStripMenuItem, Me.OriginalXPWNSourceToolStripMenuItem, Me.SeeXPWNOnGitHubToolStripMenuItem, Me.SeeIdevicerestoreOnGitHubToolStripMenuItem, Me.ToolStripSeparator1, Me.SeeBeehindOnGitHubToolStripMenuItem})
         Me.InfoMenuItem.Name = "InfoMenuItem"
         Me.InfoMenuItem.Size = New System.Drawing.Size(40, 20)
         Me.InfoMenuItem.Text = "Info"
@@ -58,20 +61,31 @@ Partial Class Form1
         'AboutBeehindToolStripMenuItem
         '
         Me.AboutBeehindToolStripMenuItem.Name = "AboutBeehindToolStripMenuItem"
-        Me.AboutBeehindToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.AboutBeehindToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.AboutBeehindToolStripMenuItem.Text = "About Beehind"
         '
         'FollowMeToolStripMenuItem
         '
         Me.FollowMeToolStripMenuItem.Name = "FollowMeToolStripMenuItem"
-        Me.FollowMeToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.FollowMeToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.FollowMeToolStripMenuItem.Text = "Follow Me"
         '
         'DonationsToolStripMenuItem
         '
         Me.DonationsToolStripMenuItem.Name = "DonationsToolStripMenuItem"
-        Me.DonationsToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.DonationsToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.DonationsToolStripMenuItem.Text = "Donations :)"
+        '
+        'OriginalXPWNSourceToolStripMenuItem
+        '
+        Me.OriginalXPWNSourceToolStripMenuItem.Name = "OriginalXPWNSourceToolStripMenuItem"
+        Me.OriginalXPWNSourceToolStripMenuItem.Size = New System.Drawing.Size(223, 6)
+        '
+        'SeeXPWNOnGitHubToolStripMenuItem
+        '
+        Me.SeeXPWNOnGitHubToolStripMenuItem.Name = "SeeXPWNOnGitHubToolStripMenuItem"
+        Me.SeeXPWNOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
+        Me.SeeXPWNOnGitHubToolStripMenuItem.Text = "See XPWN on GitHub"
         '
         'SelectModeMenuItem
         '
@@ -111,16 +125,22 @@ Partial Class Form1
         Me.CreditsToolStripMenuItem.Size = New System.Drawing.Size(56, 20)
         Me.CreditsToolStripMenuItem.Text = "Credits"
         '
-        'OriginalXPWNSourceToolStripMenuItem
+        'SeeIdevicerestoreOnGitHubToolStripMenuItem
         '
-        Me.OriginalXPWNSourceToolStripMenuItem.Name = "OriginalXPWNSourceToolStripMenuItem"
-        Me.OriginalXPWNSourceToolStripMenuItem.Size = New System.Drawing.Size(184, 6)
+        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem.Name = "SeeIdevicerestoreOnGitHubToolStripMenuItem"
+        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
+        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem.Text = "See idevicerestore on GitHub"
         '
-        'SeeXPWNOnGitHubToolStripMenuItem
+        'ToolStripSeparator1
         '
-        Me.SeeXPWNOnGitHubToolStripMenuItem.Name = "SeeXPWNOnGitHubToolStripMenuItem"
-        Me.SeeXPWNOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
-        Me.SeeXPWNOnGitHubToolStripMenuItem.Text = "See XPWN on GitHub"
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(223, 6)
+        '
+        'SeeBeehindOnGitHubToolStripMenuItem
+        '
+        Me.SeeBeehindOnGitHubToolStripMenuItem.Name = "SeeBeehindOnGitHubToolStripMenuItem"
+        Me.SeeBeehindOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
+        Me.SeeBeehindOnGitHubToolStripMenuItem.Text = "See Beehind on GitHub"
         '
         'Form1
         '
@@ -135,7 +155,7 @@ Partial Class Form1
         Me.MaximizeBox = False
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Beehind - kloader's GUI - BETA (v. 0.3)"
+        Me.Text = "Beehind - kloader's GUI - BETA (v. 0.4)"
         Me.BeehindMenuStrip.ResumeLayout(False)
         Me.BeehindMenuStrip.PerformLayout()
         Me.ResumeLayout(False)
@@ -155,5 +175,8 @@ Partial Class Form1
     Friend WithEvents IdevicerestoreModeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents OriginalXPWNSourceToolStripMenuItem As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents SeeXPWNOnGitHubToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents SeeIdevicerestoreOnGitHubToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents SeeBeehindOnGitHubToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

@@ -80,6 +80,14 @@ Public Class MainView
             Else
                 IPSWGroupBox.Text = "IPSW Identified: " + DeviceModel + "_" + iOS_Version + "_" + iOS_Build
 
+                'Checking for 6.1.3 A5 Downgrade
+                If iOS_Version = "6.1.3" Then
+                    If DeviceModel = "iPad2,1" Or DeviceModel = "iPad2,2" Or DeviceModel = "iPad2,3" Or DeviceModel = "iPhone4,1" Then
+                        OTADGForum()
+                    End If
+                End If
+
+
                 If Beehind.Betashit.IsRelease = True Then
                     ExploitType = "kloader"
                     If IsLimera1nDevice() = True Then
@@ -515,13 +523,4 @@ FileCheck:
         IPSWParser(Check_File_MD5(IPSWPath))
     End Sub
 
-    Private Function GlyphChargingNameName() As String
-        Throw New NotImplementedException
-    End Function
-
-    Private Sub Button1_Click_1(sender As Object, e As EventArgs)
-        GetInfosFromIFaithFile(appdata + "\emma.ifaith")
-        MessageBox.Show(ifaith_ios)
-        MessageBox.Show(ifaith_build)
-    End Sub
 End Class

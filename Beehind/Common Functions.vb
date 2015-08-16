@@ -116,6 +116,12 @@ Public Class Common_Functions
         MainView.CancelOTADWN.Text = "Cancel OTA Downgrade"
         IsiFaithMode = False
         ExploitType = String.Empty
+
+        If Beehind.Betashit.IsRelease = True Then
+            MainView.BasebandComboBox.Enabled = False
+            MainView.BasebandCheckBox.Enabled = False
+            MainView.CustomBundleCheckBox.Enabled = False
+        End If
     End Sub
 
     Public Shared Sub Delay(ByVal dblSecs As Double)
@@ -559,8 +565,8 @@ Public Class Common_Functions
     Public Shared Sub Updater()
         If CheckForInternetConnection() = True Then
             Using client As New WebClient
-                latestversion = Decimal.Parse(client.DownloadString("http://geeksn0w.it/Beehind/latest-win.txt"), CultureInfo.InvariantCulture)
-                ldownload = client.DownloadString("http://geeksn0w.it/Beehind/dlink-latest.win.txt")
+                latestversion = Decimal.Parse(client.DownloadString("https://raw.githubusercontent.com/BlackGeekTutorial/Beehind/master/Updater/latest-win.txt"), CultureInfo.InvariantCulture)
+                ldownload = client.DownloadString("https://raw.githubusercontent.com/BlackGeekTutorial/Beehind/master/Updater/dlink-latest.win.txt")
                 If currentversion < latestversion Then
                     MainView.UpdateLabel.Text = "This version (" + currentversion.ToString.Replace(",", ".") + ") is obsolete! Download the newer one (" + latestversion.ToString.Replace(",", ".") + ")"
                     MainView.LatestBuildLinkLabel.Visible = True

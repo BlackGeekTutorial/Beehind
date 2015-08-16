@@ -932,8 +932,6 @@ Public Class IPSWsMD5
             LLBName = "\LLB.n94ap.RELEASE.img3"
             RecoveryModeName = "\recoverymode@2x~iphone.s5l8940x.img3"
 
-            OTADGForum()
-
         ElseIf MD5Hash = iPhone4_1___7_0___11A465___MD5 Then
 
             iOS_Version = "7.0"
@@ -2438,8 +2436,6 @@ Public Class IPSWsMD5
             LLBName = "\LLB.k93ap.RELEASE.img3"
             RecoveryModeName = "\recoverymode~ipad.s5l8940x.img3"
 
-            OTADGForum()
-
         ElseIf MD5Hash = iPad2_1___7_0___11A465___MD5 Then
             iOS_Version = "7.0"
             iOS_Build = "11A465"
@@ -3514,8 +3510,6 @@ Public Class IPSWsMD5
             LLBName = "\LLB.k94ap.RELEASE.img3"
             RecoveryModeName = "\recoverymode-ipad.s5l8940x.img3"
 
-            OTADGForum()
-
         ElseIf MD5Hash = iPad2_2___7_0___11A465___MD5 Then
             iOS_Version = "7.0"
             iOS_Build = "11A465"
@@ -4587,8 +4581,6 @@ Public Class IPSWsMD5
             KernelCacheName = "\kernelcache.release.k95"
             LLBName = "\LLB.k95ap.RELEASE.img3"
             RecoveryModeName = "\recoverymode-ipad.s5l8940x.img3"
-
-            OTADGForum()
 
         ElseIf MD5Hash = iPad2_3___7_0___11A465___MD5 Then
             iOS_Version = "7.0"

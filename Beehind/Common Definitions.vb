@@ -2,7 +2,7 @@
 Imports Beehind.Common_Functions
 Public Class Common_Definitions
 
-    Public Shared currentversion As Decimal = 0.3
+    Public Shared currentversion As Decimal = 0.4
     Public Shared latestversion As Decimal
     Public Shared ldownload As String = String.Empty
     Public Shared appdata As String = GetFolderPath(SpecialFolder.ApplicationData)
@@ -93,7 +93,7 @@ Public Class Common_Definitions
         Dim UsersChoice As Integer = MessageBox.Show("You're lucky! iPhone 4S and iPad 2 possessors can UNTETHER DOWNGRADE to iOS 6.1.3 (yes, only this version) WITHOUT ANY SHSH BLOB through an OTA Downgrade. Do you want to perform an OTA Downgrade? (Press Yes to downgrade without SHSH, press No to use your own SHSH Blobs saved previously)", "OTA Signature detected", MessageBoxButtons.YesNo)
         If UsersChoice = DialogResult.No Then
             OTADowngrade = False
-        ElseIf UsersChoice = DialogResult.Yes Then
+        Else
             ECIDForm.MdiParent = Form1
             ECIDForm.Show()
             ECIDForm.WorkBar.Visible = True

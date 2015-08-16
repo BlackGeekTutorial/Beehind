@@ -91,4 +91,12 @@ Public Class Form1
     Private Sub SeeXPWNOnGitHubToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SeeXPWNOnGitHubToolStripMenuItem.Click
         Process.Start("https://github.com/planetbeing/xpwn")
     End Sub
+
+    Private Sub SeeBeehindOnGitHubToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SeeBeehindOnGitHubToolStripMenuItem.Click
+        Process.Start("https://github.com/BlackGeekTutorial/Beehind")
+    End Sub
+
+    Private Sub SeeIdevicerestoreOnGitHubToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SeeIdevicerestoreOnGitHubToolStripMenuItem.Click
+        Process.Start("https://github.com/libimobiledevice/idevicerestore")
+    End Sub
 End Class
