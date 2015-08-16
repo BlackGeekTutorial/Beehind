@@ -4,10 +4,10 @@ Imports Beehind.Processes
 Imports Beehind.keys
 Imports System.IO
 Imports System.Xml
+Imports Beehind.XML
 Imports Beehind.ECIDManagement
 Imports System.Globalization
 Imports Microsoft.VisualBasic
-
 
 Public Class SignIMG3
 
@@ -15,7 +15,6 @@ Public Class SignIMG3
 
     Public Shared APTicket() As Byte
     Public Shared AppleLogo() As Byte
-    Public Shared BatteryCharging() As Byte
     Public Shared BatteryCharging0() As Byte
     Public Shared BatteryCharging1() As Byte
     Public Shared BatteryFull() As Byte
@@ -23,6 +22,8 @@ Public Class SignIMG3
     Public Shared BatteryLow1() As Byte
     Public Shared BatteryPlugin() As Byte
     Public Shared DeviceTree() As Byte
+    Public Shared GlyphCharging() As Byte
+    Public Shared GlyphPlugin() As Byte
     Public Shared KernelCache() As Byte
     Public Shared LLB() As Byte
     Public Shared RecoveryMode() As Byte
@@ -33,6 +34,7 @@ Public Class SignIMG3
     Public Shared iBEC() As Byte
     Public Shared iBSS() As Byte
     Public Shared iBoot() As Byte
+    Public Shared NeedService() As Byte
 
     Public Shared Function RemoveHSHSTag(IMG3Path As String)
         Dim pattern As Integer() = New Integer() {&H48, &H53, &H48, &H53}
@@ -94,7 +96,7 @@ Public Class SignIMG3
                         ElseIf Blobtype = "AppleLogo" Then
                             AppleLogo = System.Convert.FromBase64String(Blob.Replace(Blobtype + "Blob", ""))
                         ElseIf Blobtype = "BatteryCharging" Then
-                            BatteryCharging = System.Convert.FromBase64String(Blob.Replace(Blobtype + "Blob", ""))
+                            GlyphCharging = System.Convert.FromBase64String(Blob.Replace(Blobtype + "Blob", ""))
                         ElseIf Blobtype = "BatteryCharging0" Then
                             BatteryCharging0 = System.Convert.FromBase64String(Blob.Replace(Blobtype + "Blob", ""))
                         ElseIf Blobtype = "BatteryCharging1" Then
@@ -154,14 +156,14 @@ Public Class SignIMG3
         End If
 
         If iOSVersion < 7 Then
-            'ios 6
+            'ios 6 or 5
             FillBlockWithBlobs("KernelCache", XMLPath, 4)
             FillBlockWithBlobs("RestoreKernelCache", XMLPath, 4)
             FillBlockWithBlobs("RestoreRamDisk", XMLPath, 4)
         End If
 
-        If iOSVersion < 6 Then
-            'ios 4 or 5
+        If iOSVersion < 5 Then
+            'ios 4
             FillBlockWithBlobs("AppleLogo", XMLPath, 4)
             FillBlockWithBlobs("BatteryCharging", XMLPath, 4)
             FillBlockWithBlobs("BatteryCharging0", XMLPath, 4)
@@ -186,15 +188,15 @@ Public Class SignIMG3
             StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\dfu" + iBSSName, iBSS)
         End If
 
-        If iOSVersion < 8 Then
+        If iOSAsInteger() < 8 Then
             'ios 7
             If SignPWN = True Then
                 StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\dfu" + iBECName, iBEC)
             End If
         End If
 
-        If iOSVersion < 7 Then
-            'ios 6
+        If iOSAsInteger() < 7 Then
+            'ios 6 or 5
             StitchBlobAndFixHeader(tempdir + "\IPSW" + KernelCacheName, KernelCache)
 
             If SignPWN = True Then
@@ -202,8 +204,8 @@ Public Class SignIMG3
             End If
         End If
 
-        If iOSVersion < 6 Then
-            'ios 4 or 5
+        If iOSAsInteger() < 5 Then
+            'ios 4 
             StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName, AppleLogo)
             StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + BatteryCharging0Name, BatteryCharging0)
             StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + BatteryCharging1Name, BatteryCharging1)
@@ -506,6 +508,8 @@ Public Class SignIMG3
             Else
                 XMLWriter.WriteLine("	<string>true</string>")
             End If
+            XMLWriter.WriteLine("		<key>DecimalECID</key>")
+            XMLWriter.WriteLine("		<string>" + CurrentDecimalECID + "</string>")
             XMLWriter.WriteLine("</dict>")
             XMLWriter.Write("</plist>")
             XMLWriter.Close()

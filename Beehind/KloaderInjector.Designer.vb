@@ -37,9 +37,9 @@ Partial Class KloaderInjector
         Me.SSHConsole = New System.Windows.Forms.RichTextBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.iBSSFIleDialog = New System.Windows.Forms.OpenFileDialog()
-        Me.SSHBackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.IPLabel = New System.Windows.Forms.Label()
         Me.IPTextBox = New System.Windows.Forms.TextBox()
+        Me.WiFiSSHBG = New System.ComponentModel.BackgroundWorker()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
@@ -155,10 +155,6 @@ Partial Class KloaderInjector
         Me.Label5.TabIndex = 9
         Me.Label5.Text = "Known events:"
         '
-        'SSHBackgroundWorker
-        '
-        Me.SSHBackgroundWorker.WorkerReportsProgress = True
-        '
         'IPLabel
         '
         Me.IPLabel.AutoSize = True
@@ -176,6 +172,9 @@ Partial Class KloaderInjector
         Me.IPTextBox.Name = "IPTextBox"
         Me.IPTextBox.Size = New System.Drawing.Size(127, 20)
         Me.IPTextBox.TabIndex = 9
+        '
+        'WiFiSSHBG
+        '
         '
         'KloaderInjector
         '
@@ -216,7 +215,7 @@ Partial Class KloaderInjector
     Friend WithEvents SSHConsole As System.Windows.Forms.RichTextBox
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents iBSSFIleDialog As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents SSHBackgroundWorker As System.ComponentModel.BackgroundWorker
     Friend WithEvents IPLabel As System.Windows.Forms.Label
     Friend WithEvents IPTextBox As System.Windows.Forms.TextBox
+    Friend WithEvents WiFiSSHBG As System.ComponentModel.BackgroundWorker
 End Class

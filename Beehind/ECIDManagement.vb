@@ -2,45 +2,12 @@
 Imports Beehind.Common_Functions
 Imports System.IO
 
-
 Public Class ECIDManagement
 
     Public Shared CurrentDecimalECID As String = String.Empty
     Public Shared CurrentHexECID As String = String.Empty
     Public Shared CurrentBinaryECID As Byte()
     Public Shared CurrentBase64ECID As String = String.Empty
-
-    Public Shared Function IsHex(ByVal Expression As String) As Boolean
-
-        On Error GoTo ErrorHandler
-
-        Dim lonValue As Long
-
-        'Remove ending & if present
-        If Right$(Expression, 1) = "&" Then
-            Expression = Left$(Expression, Len(Expression) - 1)
-        End If
-
-        'Check if starting with &H
-        If LCase$(Left$(Expression, 2)) = "&h" Then
-            lonValue = CLng(Expression)
-        Else
-            lonValue = CLng("&H" & Expression)
-        End If
-
-        IsHex = True
-
-        Exit Function
-
-ErrorHandler:
-
-        If Err.Number = 6 Then 'Overflow
-            IsHex = True 'Still a number, just too big
-        End If
-
-        Exit Function
-
-    End Function
 
     Public Shared Function IsHexECID(NumIn As String) As Boolean
         Dim decNum, hexNum As Boolean
@@ -49,15 +16,8 @@ ErrorHandler:
             decNum = NumIn.All(Function(c) Char.IsDigit(c))
             hexNum = (NumIn.Length Mod 2 = 0) AndAlso NumIn.All(Function(c) "0123456789abcdefABCDEF".Contains(c))
         End If
-        'MessageBox.Show("Possible dec: " & decNum & " - possible hex: " & hexNum)
         Return hexNum
     End Function
-
-    Public Shared Function OnlyHexInString(test As String) As Boolean
-        ' For C-style hex notation (0xFF) you can use @"\A\b(0[xX])?[0-9a-fA-F]+\b\Z"
-        Return System.Text.RegularExpressions.Regex.IsMatch(test, "\A\b[0-9a-fA-F]+\b\Z")
-    End Function
-
 
     Public Shared Sub ECIDParser(ECID As String)
         If IsHexECID(ECID) = True Then
@@ -122,7 +82,6 @@ ErrorHandler:
     End Function
 
     Public Shared Function base64ECIDConverter(base64ECID As String, ReturnDecECID As Boolean, ReturnHexECID As Boolean, ReturnHexReversedECID As Boolean, ReturnByteArrayECID As Boolean)
-
         Dim BinaryECID As Byte() = Convert.FromBase64String(base64ECID) 'OK
         If ReturnByteArrayECID = True Then
             Return BinaryECID

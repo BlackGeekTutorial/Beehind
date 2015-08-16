@@ -85,6 +85,7 @@
     <Compile Include="Betashit.vb" />
     <Compile Include="Common Definitions.vb" />
     <Compile Include="Common Functions.vb" />
+    <Compile Include="Digests.vb" />
     <Compile Include="ECIDForm.Designer.vb">
       <DependentUpon>ECIDForm.vb</DependentUpon>
     </Compile>
@@ -105,6 +106,7 @@
     <Compile Include="idevicerestore.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="iFaithMode.vb" />
     <Compile Include="IMG3Patches.vb" />
     <Compile Include="IPSW URLs.vb" />
     <Compile Include="IPSW MD5s.vb" />
@@ -138,12 +140,6 @@
     </Compile>
     <Compile Include="Processes.vb" />
     <Compile Include="ProcessUtilities.vb" />
-    <Compile Include="pwntunes.Designer.vb">
-      <DependentUpon>pwntunes.vb</DependentUpon>
-    </Compile>
-    <Compile Include="pwntunes.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="ResourceHandler.vb" />
     <Compile Include="Restore.Designer.vb">
       <DependentUpon>Restore.vb</DependentUpon>
@@ -152,7 +148,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="RestoreClass.vb" />
+    <Compile Include="SHSH.vb" />
     <Compile Include="SignIMG3.vb" />
+    <Compile Include="XML.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ECIDForm.resx">
@@ -175,9 +173,6 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="pwntunes.resx">
-      <DependentUpon>pwntunes.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Restore.resx">
       <DependentUpon>Restore.vb</DependentUpon>

@@ -279,6 +279,7 @@ Partial Class idevicerestoreGUI
         Me.RestoreOptionsGroupBox.TabIndex = 25
         Me.RestoreOptionsGroupBox.TabStop = False
         Me.RestoreOptionsGroupBox.Text = "Restore Options:"
+        Me.RestoreOptionsGroupBox.Visible = False
         '
         'idevicerestoreGUI
         '

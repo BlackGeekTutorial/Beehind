@@ -130,12 +130,12 @@ First of all, install OpenSSH from Cydia; then connect your device to the comput
 After that, select your custom iBSS IMG3 generated from Beehind and click the "Enter Pwned DFU Mode" button.</value>
   </data>
   <metadata name="iBSSFIleDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>148, 3</value>
+    <value>132, 15</value>
   </metadata>
-  <metadata name="SSHBackgroundWorker.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>148, 17</value>
+  <metadata name="WiFiSSHBG.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>261, 15</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>25</value>
+    <value>53</value>
   </metadata>
 </root>

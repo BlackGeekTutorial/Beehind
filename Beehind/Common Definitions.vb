@@ -1,10 +1,8 @@
 ﻿Imports System.Environment
 Imports Beehind.Common_Functions
-
-
 Public Class Common_Definitions
 
-    Public Shared currentversion As Decimal = 0.2
+    Public Shared currentversion As Decimal = 0.3
     Public Shared latestversion As Decimal
     Public Shared ldownload As String = String.Empty
     Public Shared appdata As String = GetFolderPath(SpecialFolder.ApplicationData)
@@ -16,6 +14,9 @@ Public Class Common_Definitions
     Public Shared BasebandPath As String = String.Empty
     Public Shared CustomBundlePath As String = String.Empty
     Public Shared OTADowngrade As Boolean = False
+    Public Shared TetheredDowngrade As Boolean = False
+    Public Shared IsiFaithMode As Boolean = False
+    Public Shared ExploitType As String = String.Empty
     'Public Shared DeviceNormalModeConnected As Boolean = False
     Public Shared iBSSToKload As String = String.Empty
 
@@ -124,4 +125,89 @@ Public Class Common_Definitions
             End If
         End If
     End Sub
+
+    Public Shared Sub TetheredDGForum()
+        Dim UsersChoice As Integer = MessageBox.Show("There are two available downgrades for your device:" + Environment.NewLine + "- Tethered Downgrade: It DOESN'T REQUIRE any SHSH Blob, but it is tethered! If you execute it on your device, it won't be able to boot up autonomously: you'll need to plug into the Computer and use tools like RedSn0w everytime you want to switch it on." + Environment.NewLine + "- Untethered Downgrade: It's a complete downgrade (your device will be able to boot up autonomously), but to execute it, you need saved unique SHSH Blobs of the old Firmware you want to install for your specific device." + Environment.NewLine + Environment.NewLine + "Basically: if you have valid SHSH Blobs, click Yes for a standard untethered downgrade; else, click No for a tethered downgrade", "To do or not To Do?", MessageBoxButtons.YesNo)
+        If UsersChoice = DialogResult.No Then
+            TetheredDowngrade = True
+            MainView.NoNANDFlashCheckBox.Checked = True
+            MainView.NoNANDFlashCheckBox.Enabled = False
+            MainView.ChooseSHSHButton.Visible = False
+            MainView.SHSHGroupBox.Text = "No Blobs are required to perform a Tethered Downgrade"
+            MainView.CancelOTADWN.Visible = True
+            MainView.CancelOTADWN.Text = "Cancel Tethered Downgrade"
+            MainView.MagicButton.Enabled = True
+        End If
+    End Sub
+
+    Public Shared Function IsLimera1nDevice()
+        If DeviceModel = "iPhone2,1" Or DeviceModel = "iPhone3,1" Or DeviceModel = "iPhone3,2" Or DeviceModel = "iPhone3,3" Or DeviceModel = "iPod3,1" Or DeviceModel = "iPod4,1" Or DeviceModel = "iPad1,1" Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Public Shared Function iOSFromBuild(Build As String)
+        If Build = "9A334" Then
+            Return "5.0"
+        ElseIf Build = "9A405" Or Build = "9A406" Then
+            Return "5.0.1"
+        ElseIf Build = "9B176" Then
+            Return "5.1"
+        ElseIf Build = "9B206" Or Build = "9B208" Then
+            Return "5.1.1"
+        ElseIf Build = "10A403" Then
+            Return "6.0"
+        ElseIf Build = "10A523" Then
+            Return "6.0.1"
+        ElseIf Build = "10B144" Then
+            Return "6.1"
+        ElseIf Build = "10B145" Then
+            Return "6.1.1"
+        ElseIf Build = "10B146" Then
+            Return "6.1.2"
+        ElseIf Build = "10B329" Then
+            Return "6.1.3"
+        ElseIf Build = "11A465" Then
+            Return "7.0"
+        ElseIf Build = "11A501" Then
+            Return "7.0.2"
+        ElseIf Build = "11B511" Then
+            Return "7.0.3"
+        ElseIf Build = "11B554a" Then
+            Return "7.0.4"
+        ElseIf Build = "11B601" Then
+            Return "7.0.5"
+        ElseIf Build = "11B651" Then
+            Return "7.0.6"
+        ElseIf Build = "11D169" Then
+            Return "7.1"
+        ElseIf Build = "11D201" Then
+            Return "7.1.1"
+        ElseIf Build = "11D257" Then
+            Return "7.1.2"
+        ElseIf Build = "12A365" Then
+            Return "8.0"
+        ElseIf Build = "12A402" Then
+            Return "8.0.1"
+        ElseIf Build = "12A405" Then
+            Return "8.0.2"
+        ElseIf Build = "12B411" Then
+            Return "8.1"
+        ElseIf Build = "12B435" Then
+            Return "8.1.1"
+        ElseIf Build = "12B440" Then
+            Return "8.1.2"
+        ElseIf Build = "12B466" Then
+            Return "8.1.3"
+        ElseIf Build = "12D508" Then
+            Return "8.2"
+        ElseIf Build = "12F70" Then
+            Return "8.3"
+        ElseIf Build = "12H143" Then
+            Return "8.4"
+
+        End If
+    End Function
 End Class

@@ -7,6 +7,7 @@ Imports System.Xml
 Imports System.IO.Compression
 Imports System.IO
 Imports System.Windows.Threading
+Imports Beehind.XML
 
 Public Class idevicerestoreGUI
 
@@ -18,32 +19,11 @@ Public Class idevicerestoreGUI
             MessageBox.Show("File 'Beehind.xml' NOT found! IPSW could be corrupted or it has been created with an outdated version of Beehind. Please, re-create it with this current version.", "Missing 'Beehind.xml'", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Exit Function
         End If
-        Dim reader As XmlTextReader = New XmlTextReader(tempdir + "\Restore\Beehind.xml")
-        Dim DumpedItems As Integer = 0
-        Dim RawDump As String = String.Empty
-        Dim MaxPick As Integer = 3
-        Dim OutputItem As String = String.Empty
-        Do While (reader.Read())
-            Select Case reader.NodeType
-                Case XmlNodeType.Text
-                    If reader.Value = "Pre-Signed" Then
-                        DumpedItems = DumpedItems + 1
-                    End If
-                    If DumpedItems > 0 And DumpedItems <> MaxPick Then
-                        DumpedItems = DumpedItems + 1
-                        RawDump = RawDump + reader.Value
-                    End If
-                    If DumpedItems = MaxPick Then
-                        OutputItem = RawDump.Replace("Pre-Signed", "")
-                        DumpedItems = DumpedItems + 1
-                    End If
-            End Select
-        Loop
-        reader.Close()
+        Dim IsPreSigned As String = GetTextFromXMLItem(tempdir + "\Restore\Beehind.xml", 3, "Pre-Signed", "Pre-Signed")
         Delete(False, tempdir + "\Restore\Beehind.xml")
-        If OutputItem = "false" Then
+        If IsPreSigned = "false" Then
             Return False
-        ElseIf OutputItem = "true" Then
+        ElseIf IsPreSigned = "true" Then
             Return True
         Else
             MessageBox.Show("ERROR: Beehind wasn't able to determinate the IPSW type.. Are you sure it's valid? Maybe you've created it with an older version of Beehind; if yes, please, re-create it with the current version!", "Plist reading fail", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -61,13 +41,10 @@ Public Class idevicerestoreGUI
     End Sub
 
     Private Sub RestoreButton_Click(sender As Object, e As EventArgs) Handles RestoreButton.Click
-
-        'MessageBox.Show(RestoreArguments)
-        Kill({"iTunes", "idevicerestore"})
+        Kill({"iTunes", "idevicerestore", "iTunesHelper"})
         Dim iTunesHelper As Process() = Process.GetProcessesByName("iTunesHelper")
         'SuspendProcess(iTunesHelper(0))
         Dim BeehindMode As Boolean = IsThisIPSWPreSigned(IPSWPathTextBox.Text)
-
 
         If BeehindMode = True Then
             RestoreArguments = "--avoidsign " + """" + IPSWPathTextBox.Text + """"
@@ -76,8 +53,6 @@ Public Class idevicerestoreGUI
             RestoreArguments = "-e " + """" + IPSWPathTextBox.Text + """"
             idevicerestore(RestoreArguments, False)
         End If
-
-
         'ResumeProcess(iTunesHelper(0))
     End Sub
 

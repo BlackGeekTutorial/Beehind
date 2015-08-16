@@ -11,10 +11,11 @@ Public Class KloaderInjector
 
     Public Shared SSHBWProgress As Integer = 0
     Public Shared kloaderoutput As String = String.Empty
+    Public Shared iBSS As String = String.Empty
 
-    Public Shared Sub AddLineToRestoreConsole(Text As String)
+    Public Shared Sub AddLineToKloaderConsole(Text As String)
         KloaderInjector.SSHConsole.AppendText(Environment.NewLine + Text)
-        KloaderInjector.SSHConsole.SelectionStart = Restore.RawRestoreConsole.TextLength
+        KloaderInjector.SSHConsole.SelectionStart = KloaderInjector.SSHConsole.TextLength
         KloaderInjector.SSHConsole.ScrollToCaret()
     End Sub
     Private Sub DeviceChecker_Tick(sender As Object, e As EventArgs) Handles DeviceChecker.Tick
@@ -26,42 +27,78 @@ Public Class KloaderInjector
 
         If IsUserlandConnected() = True And iBSSPathTextBox.Text <> "" Then
             PwnDFUButton.Enabled = True
+        Else
+            PwnDFUButton.Enabled = False
         End If
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles PwnDFUButton.Click
-        Dim iBSS As String = File.ReadAllText(iBSSPathTextBox.Text)
-        If Not iBSS.StartsWith("3gmI") Then
-            MessageBox.Show("The provided IMG3 file is NOT valid! Please, select a valid patched iBSS's IMG3 and retry", "Not an IMG3 File!", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        Else
-            If Not iBSS.Contains("ssbiEPYT") Then
-                Dim result As Integer = MessageBox.Show("The provided file is an IMG3, but it doesn't seem to contain an iBSS image. Perhaps you're an expert user, do you really want to continue?", "Wrong IMG3 Container?", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-                If result = DialogResult.No Then
+
+        'making sure iBSS is suitable for the connected device
+        iBSS = File.ReadAllText(iBSSPathTextBox.Text)
+        Dim DeviceInfos As String = GetDeviceInfos()
+        Dim DumpedHardwareModel As String = (DeviceInfos.Substring(DeviceInfos.IndexOf("HardwareModel") + 15)).Substring(0, (DeviceInfos.Substring(DeviceInfos.IndexOf("HardwareModel") + 15)).IndexOf(Environment.NewLine)).Trim()
+        Dim iBSSHardwareModel As String = (Strings.Mid(iBSS, iBSS.IndexOf("iBSS for ") + ("iBSS for ").Length + 1, iBSS.IndexOf(", Copyright ") - iBSS.IndexOf("iBSS for ") - ("iBSS for ").Length)).Trim()
+        AddLineToKloaderConsole("[Info] The given iBSS' Hardware model is: " + """" + iBSSHardwareModel + """")
+        If DumpedHardwareModel.StartsWith("N") Or DumpedHardwareModel.StartsWith("K") Or DumpedHardwareModel.StartsWith("J") Or DumpedHardwareModel.StartsWith("P") Or DumpedHardwareModel.StartsWith("N") Then
+            AddLineToKloaderConsole("[Info] The attached device's Hardware model is " + """" + DumpedHardwareModel + """")
+            If Not iBSSHardwareModel = DumpedHardwareModel And Not iBSSHardwareModel = DumpedHardwareModel.ToLower Then
+                Dim choice As Integer = MessageBox.Show("The given iBSS file has been made for " + iBSSHardwareModel + ". Your device's Hardware model (" + DumpedHardwareModel + ") mismatch! Do you want to proceed anyway?", "HardwareModel mismatch", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+                If choice = DialogResult.No Then
                     Exit Sub
                 End If
             End If
+        Else
+            AddLineToKloaderConsole("[Info] Beehind wasn't able to dump devices informations... Continuing anyway.")
         End If
 
-        SSHBackgroundWorker.RunWorkerAsync()
-        Do Until IsUserlandConnected() = False
-            Delay(1)
-        Loop
-        AddLineToRestoreConsole("[Info] Event: Device disconnected.")
-
+        If (IPTextBox.Text).Trim = "" Then
+            AddLineToKloaderConsole("[Info] Starting SSH over usb... It will take several seconds")
+            SSH_Over_USB("22", "22")
+            Dim SSHSessionOptions As New SessionOptions
+            With SSHSessionOptions
+                .Protocol = Protocol.Sftp
+                .HostName = "127.0.0.1"
+                .UserName = "root"
+                .Password = "alpine"
+                .PortNumber = "22"
+                .GiveUpSecurityAndAcceptAnySshHostKey = True
+            End With
+            Using SSHSession As Session = New Session
+                SSHSession.DisableVersionCheck = True
+                SSHSession.ExecutablePath = tempdir + "\WinSCP.exe"
+                SSHSession.Open(SSHSessionOptions)
+                Dim SSHTransferOptions As New TransferOptions
+                SSHTransferOptions.TransferMode = TransferMode.Binary
+                Dim SSHTransferResult As TransferOperationResult
+                FileCopy(tempdir + "\kloader", tempdir + "\kloader.totransfer")
+                SSHTransferResult = SSHSession.PutFiles(tempdir + "\kloader.totransfer", "/usr/bin/kloader", True, SSHTransferOptions)
+                FileCopy(iBSSPathTextBox.Text, iBSSPathTextBox.Text + ".totransfer")
+                SSHTransferResult = SSHSession.PutFiles(iBSSPathTextBox.Text + ".totransfer", "/var/ibss", True, SSHTransferOptions)
+                SSHSession.ExecuteCommand("chmod 755 /usr/bin/kloader; chmod 777 /var/ibss; kloader /var/ibss")
+                SSHSession.Close()
+            End Using
+        Else
+            AddLineToKloaderConsole("[Info] Starting SSH over Wi-Fi... It will take several seconds")
+            WiFiSSHBG.RunWorkerAsync()
+            Do Until IsUserlandConnected() = False
+                Delay(1)
+            Loop
+        End If
+        AddLineToKloaderConsole("[Info] Event: Device disconnected.")
         If IPTextBox.Text = "" Then
-            AddLineToRestoreConsole("[Info] Stopping SSH over usb.")
+            AddLineToKloaderConsole("[Info] Stopping SSH over usb.")
             End_SSH_Over_USB()
         End If
 
+        'checking for kdfu mode
         Dim tensec As Integer = 0
         Do Until tensec = 10
             If IsDFUConnected() = True Then
-                AddLineToRestoreConsole("[Info] Event: New DFU Mode device connected.")
+                AddLineToKloaderConsole("[Info] Event: New DFU Mode device connected.")
                 tensec = 10
-
             ElseIf IsDFUConnected() = False Then
-                AddLineToRestoreConsole("[!] Waiting for Soft DFU Mode")
+                AddLineToKloaderConsole("[!] Waiting for Soft DFU Mode")
                 Delay(1)
                 tensec = tensec + 1
             End If
@@ -73,9 +110,9 @@ Public Class KloaderInjector
             Do Until tensec = 10
                 If IsDFUConnected() = True Then
                     tensec = 10
-                    AddLineToRestoreConsole("[Info] Event: New DFU Mode device connected.")
+                    AddLineToKloaderConsole("[Info] Event: New DFU Mode device connected.")
                 ElseIf IsDFUConnected() = False Then
-                    AddLineToRestoreConsole("[!] Waiting for Soft DFU Mode")
+                    AddLineToKloaderConsole("[!] Waiting for Soft DFU Mode")
                     Delay(1)
                     tensec = tensec + 1
                 End If
@@ -92,7 +129,6 @@ Public Class KloaderInjector
                                     MessageBoxButtons.OK, MessageBoxIcon.Information)
         Restore.MdiParent = Form1
         Me.Close()
-        'Restore.Show()
         idevicerestoreGUI.MdiParent = Form1
         idevicerestoreGUI.Show()
         Exit Sub
@@ -105,41 +141,55 @@ Public Class KloaderInjector
         If iBSSFIleDialog.ShowDialog = DialogResult.Abort Then
             Exit Sub
         End If
+
+        Dim iBSSFileInfo As New FileInfo(iBSSFIleDialog.FileName)
+        Dim iBSSFileSize As Long = iBSSFileInfo.Length
+        If iBSSFileSize > 1000000 Then
+            MessageBox.Show("Your file is size (" + Convert.ToInt32(iBSSFileSize / 1000000).ToString + " MB) is too big. It can't be iBSS!", "Too BIG!", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Exit Sub
+        Else
+            iBSS = File.ReadAllText(iBSSFIleDialog.FileName)
+            If Not iBSS.StartsWith("3gmI") Then
+                MessageBox.Show("The provided IMG3 file is NOT valid! Please, select a valid patched iBSS's IMG3 and retry", "Not an IMG3 File!", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+            Else
+                If Not iBSS.Contains("ssbiEPYT") Then
+                    Dim result As Integer = MessageBox.Show("The provided file is an IMG3, but it doesn't seem to contain an iBSS image. Perhaps you're an expert user, do you really want to continue?", "Wrong IMG3 Container?", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+                    If result = DialogResult.No Then
+                        Exit Sub
+                    End If
+                Else
+                    If Not iBSS.Contains("iBSS for") Then
+                        MessageBox.Show("Refusing to submit this iBSS since it seems encrypted. Kloader only accepts decrypted IMG3 files.", "Object not found in header", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        Exit Sub
+                    End If
+                End If
+            End If
+        End If
+        MessageBox.Show("The iBSS you provided looks valid :)", "Valid iBSS!", MessageBoxButtons.OK, MessageBoxIcon.Information)
         iBSSPathTextBox.Text = iBSSFIleDialog.FileName
-        AddLineToRestoreConsole("[!] New entry: '" + iBSSPathTextBox.Text + "'")
+        AddLineToKloaderConsole("[!] New entry: '" + iBSSPathTextBox.Text + "'")
     End Sub
 
-    Private Sub SSHBackgroundWorker_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles SSHBackgroundWorker.DoWork
+    Private Sub WiFiSSHBG_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles WiFiSSHBG.DoWork
         Dim SSHSessionOptions As New SessionOptions
         With SSHSessionOptions
             .Protocol = Protocol.Sftp
-            If IPTextBox.Text <> "" Then
-                If IsIpValid(IPTextBox.Text) = True Then
-                    .HostName = IPTextBox.Text
-                Else
-                    MessageBox.Show("The IP Address you've entered is NOT valid! Enter your device's Wi-Fi IP Address or live that form blank to try to autoconnect", "Invalid IP Address", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    Exit Sub
-                End If
+            If IsIpValid(IPTextBox.Text) = True Then
+                .HostName = IPTextBox.Text
             Else
-                .HostName = "127.0.0.1"
+                MessageBox.Show("The IP Address you've entered is NOT valid! Enter your device's Wi-Fi IP Address or leave that box blank to try autoconnect", "Invalid IP Address", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
             End If
             .UserName = "root"
             .Password = "alpine"
             .PortNumber = "22"
             .GiveUpSecurityAndAcceptAnySshHostKey = True
         End With
-        If IPTextBox.Text = "" Then
-            AddLineToRestoreConsole("[Info] Starting SSH over usb... It will take some seconds")
-            SSH_Over_USB("22", "22")
-        Else
-            AddLineToRestoreConsole("[Info] Starting SSH over Wi-Fi... It will take some seconds")
-        End If
-
         Using SSHSession As Session = New Session
             SSHSession.DisableVersionCheck = True
             SSHSession.ExecutablePath = tempdir + "\WinSCP.exe"
             SSHSession.Open(SSHSessionOptions)
-
             Dim SSHTransferOptions As New TransferOptions
             SSHTransferOptions.TransferMode = TransferMode.Binary
             Dim SSHTransferResult As TransferOperationResult
@@ -147,8 +197,7 @@ Public Class KloaderInjector
             SSHTransferResult = SSHSession.PutFiles(tempdir + "\kloader.totransfer", "/usr/bin/kloader", True, SSHTransferOptions)
             FileCopy(iBSSPathTextBox.Text, iBSSPathTextBox.Text + ".totransfer")
             SSHTransferResult = SSHSession.PutFiles(iBSSPathTextBox.Text + ".totransfer", "/var/ibss", True, SSHTransferOptions)
-            SSHSession.ExecuteCommand("chmod 755 /usr/bin/kloader; chmod 777 /var/ibss")
-            SSHSession.ExecuteCommand("sleep 2 && kloader /var/ibss")
+            SSHSession.ExecuteCommand("chmod 755 /usr/bin/kloader; chmod 777 /var/ibss; kloader /var/ibss")
             SSHSession.Close()
         End Using
     End Sub

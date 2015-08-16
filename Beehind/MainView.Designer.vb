@@ -61,6 +61,7 @@ Partial Class MainView
         Me.ProgressLabel = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
+        Me.MD5CheckerBW = New System.ComponentModel.BackgroundWorker()
         Me.GeneralOptionsGroupBox.SuspendLayout()
         CType(Me.NewSizeUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.InstructionsGroupBox.SuspendLayout()
@@ -256,7 +257,7 @@ Partial Class MainView
         Me.InstructionsGroupBox.Size = New System.Drawing.Size(742, 92)
         Me.InstructionsGroupBox.TabIndex = 9
         Me.InstructionsGroupBox.TabStop = False
-        Me.InstructionsGroupBox.Text = "Instructions:"
+        Me.InstructionsGroupBox.Text = "Informations:"
         '
         'IntroductionLabel
         '
@@ -427,6 +428,9 @@ Partial Class MainView
         '
         Me.OpenFileDialog1.FileName = "CustomBundleFileDialog"
         '
+        'MD5CheckerBW
+        '
+        '
         'MainView
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -501,4 +505,5 @@ Partial Class MainView
     Friend WithEvents AddCydiaCheckBox As System.Windows.Forms.CheckBox
     Friend WithEvents NoSysFlashCheckBox As System.Windows.Forms.CheckBox
     Friend WithEvents NoNANDFlashCheckBox As System.Windows.Forms.CheckBox
+    Friend WithEvents MD5CheckerBW As System.ComponentModel.BackgroundWorker
 End Class

@@ -18,6 +18,7 @@ Public Class Common_Functions
     Public Shared Sub Reset()
         MainView.IPSWTextBox.Text = ""
         OTADowngrade = False
+        TetheredDowngrade = False
         MainView.IPSWGroupBox.Text = "Browse for the IPSW"
         MainView.SHSHGroupBox.Text = "Browse for SHSH"
         MainView.SHSHTextBox.Text = ""
@@ -28,8 +29,93 @@ Public Class Common_Functions
         MainView.PathLabelIPSW.Text = "Path:"
         MainView.PathLabelSHSH.Text = "Path:"
         MainView.ChooseSHSHButton.Enabled = True
+        MainView.ChooseSHSHButton.Visible = True
         MainView.ChooseIPSWButton.Enabled = True
         MainView.DowngradeProgressBar.Value = 0
+        MainView.BasebandCheckBox.Checked = False
+        MainView.BasebandCheckBox.Enabled = True
+        MainView.BasebandComboBox.Text = ""
+        MainView.CustomSizeCheckBox.Checked = False
+        MainView.CustomSizeCheckBox.Enabled = True
+        MainView.NewSizeUpDown.Value = 1024
+        MainView.NewSizeUpDown.Enabled = True
+        MainView.CustomBundleCheckBox.Enabled = True
+        MainView.CustomBundleCheckBox.Checked = False
+        MainView.HacktivateCheckBox.Checked = False
+        MainView.HacktivateCheckBox.Enabled = True
+        MainView.AddUntetherCheckBox.Enabled = True
+        MainView.AddUntetherCheckBox.Checked = False
+        MainView.AddSSHCheckBox.Enabled = True
+        MainView.AddSSHCheckBox.Checked = False
+        MainView.AddCydiaCheckBox.Enabled = True
+        MainView.AddCydiaCheckBox.Checked = False
+        MainView.NoNANDFlashCheckBox.Enabled = True
+        MainView.NoNANDFlashCheckBox.Checked = False
+        MainView.NoSysFlashCheckBox.Enabled = True
+        MainView.NoSysFlashCheckBox.Checked = False
+        iOS_Version = ""
+        iOS_Build = ""
+        DeviceModel = ""
+        board_id = ""
+        iPhoneProcessor = ""
+        CurrentRootFSKey = ""
+        CurrentRestoreRamdiskIV = ""
+        CurrentRestoreRamdiskKey = ""
+        CurrentUpdateRamdiskIV = ""
+        CurrentUpdateRamdiskKey = ""
+        CurrentAppleLogoIV = ""
+        CurrentAppleLogoKey = ""
+        CurrentBatteryCharging0IV = ""
+        CurrentBatteryCharging0Key = ""
+        CurrentBatteryCharging1IV = ""
+        CurrentBatteryCharging1Key = ""
+        CurrentBatteryFullIV = ""
+        CurrentBatteryFullKey = ""
+        CurrentBatteryLow0IV = ""
+        CurrentBatteryLow0Key = ""
+        CurrentBatteryLow1IV = ""
+        CurrentBatteryLow1Key = ""
+        CurrentDeviceTreeIV = ""
+        CurrentDeviceTreeKey = ""
+        CurrentGlyphPluginIV = ""
+        CurrentGlyphPluginKey = ""
+        CurrentIBECIV = ""
+        CurrentIBECKey = ""
+        CurrentiBootIV = ""
+        CurrentiBootKey = ""
+        CurrentIBSSIV = ""
+        CurrentIBSSKey = ""
+        CurrentKernelCacheIV = ""
+        CurrentKernelCacheKey = ""
+        CurrentLLBIV = ""
+        CurrentLLBKey = ""
+        CurrentRecoveryModeIV = ""
+        CurrentRecoveryModeKey = ""
+        all_flashFolder = ""
+        rootfsName = ""
+        UpdateRamdiskName = ""
+        RestoreRamdiskName = ""
+        AppleLogoName = ""
+        BatteryCharging0Name = ""
+        BatteryCharging1Name = ""
+        BatteryFullName = ""
+        BatteryLow0Name = ""
+        BatteryLow1Name = ""
+        DeviceTreeName = ""
+        GlyphPluginName = ""
+        iBECName = ""
+        iBootName = ""
+        iBSSName = ""
+        KernelCacheName = ""
+        LLBName = ""
+        RecoveryModeName = ""
+        ECIDForm.Close()
+        SHSHPath = ""
+        XMLPath = ""
+        MainView.CancelOTADWN.Visible = False
+        MainView.CancelOTADWN.Text = "Cancel OTA Downgrade"
+        IsiFaithMode = False
+        ExploitType = String.Empty
     End Sub
 
     Public Shared Sub Delay(ByVal dblSecs As Double)
@@ -60,6 +146,15 @@ Public Class Common_Functions
                 End If
             End If
     End Sub
+
+    Public Shared Sub DeleteLine(ByRef FileAddress As String, ByRef line As Integer)
+        Dim TheFileLines As New List(Of String)
+        TheFileLines.AddRange(System.IO.File.ReadAllLines(FileAddress))
+        If line >= TheFileLines.Count Then Exit Sub
+        TheFileLines.RemoveAt(line)
+        System.IO.File.WriteAllLines(FileAddress, TheFileLines.ToArray)
+    End Sub
+
 
     Public Shared Function ReadAllBytes(reader As BinaryReader) As Byte()
         Const bufferSize As Integer = 4096
@@ -330,14 +425,24 @@ Public Class Common_Functions
     End Sub
 
     Public Shared Function iOSAsInteger()
-        If iOS_Version = "5.0" Or iOS_Version = "5.0.1" Or iOS_Version = "5.1" Or iOS_Version = "5.1.1" Then
+        If iOS_Version.StartsWith("1.") Then
+            Return 1
+        ElseIf iOS_Version.StartsWith("2.") Then
+            Return 2
+        ElseIf iOS_Version.StartsWith("3.") Then
+            Return 3
+        ElseIf iOS_Version.StartsWith("4.") Then
+            Return 4
+        ElseIf iOS_Version.StartsWith("5.") Then
             Return 5
-        ElseIf iOS_Version = "6.0" Or iOS_Version = "6.0.1" Or iOS_Version = "6.0.2" Or iOS_Version = "6.1" Or iOS_Version = "6.1.1" Or iOS_Version = "6.1.2" Or iOS_Version = "6.1.3" Or iOS_Version = "6.1.4" Or iOS_Version = "6.1.5" Or iOS_Version = "6.1.6" Then
+        ElseIf iOS_Version.StartsWith("6.") Then
             Return 6
-        ElseIf iOS_Version = "7.0" Or iOS_Version = "7.0.1" Or iOS_Version = "7.0.2" Or iOS_Version = "7.0.3" Or iOS_Version = "7.0.4" Or iOS_Version = "7.0.5" Or iOS_Version = "7.0.6" Or iOS_Version = "7.1" Or iOS_Version = "7.1.1" Or iOS_Version = "7.1.2" Then
+        ElseIf iOS_Version.StartsWith("7.") Then
             Return 7
-        ElseIf iOS_Version = "8.0" Or iOS_Version = "8.0.1" Or iOS_Version = "8.0.2" Or iOS_Version = "8.1" Or iOS_Version = "8.1" Or iOS_Version = "8.1.1" Or iOS_Version = "8.1.2" Or iOS_Version = "8.1.3" Or iOS_Version = "8.2" Or iOS_Version = "8.3" Then
+        ElseIf iOS_Version.StartsWith("8.") Then
             Return 8
+        ElseIf iOS_Version.StartsWith("9.") Then
+            Return 9
         End If
     End Function
 
@@ -431,7 +536,6 @@ Public Class Common_Functions
         Return Process.GetProcessesByName(ProcessName).Count
     End Function
 
-
     Public Shared Sub Kill(ProcessesList As String())
         For Each ProcessName In ProcessesList
             Dim SubProcesses() As Process = Process.GetProcessesByName(ProcessName)
@@ -450,40 +554,9 @@ Public Class Common_Functions
             End If
         Next
         Return False
-
     End Function
 
-
-    Public Shared Function WhatProcessesAreLockingAFile(File As String)
-        Dim myProcessArray As New ArrayList()
-        Dim myProcess As Process
-        myProcessArray.Clear()
-        Dim processes As Process() = Process.GetProcesses()
-        Dim i As Integer = 0
-        For i = 0 To processes.GetUpperBound(0) - 1
-            myProcess = processes(i)
-            'if (!myProcess.HasExited) //This will cause an "Access is denied" error
-            If myProcess.Threads.Count > 0 Then
-                Try
-                    Dim modules As ProcessModuleCollection = myProcess.Modules
-                    Dim j As Integer = 0
-                    For j = 0 To modules.Count - 1
-                        If (modules(j).FileName.ToLower().CompareTo(File.ToLower()) = 0) Then
-                            myProcessArray.Add(myProcess)
-                            ' TODO: might not be correct. Was : Exit For
-                            Exit For
-                        End If
-                    Next
-                    'MsgBox(("Error : " & exception.Message)) 
-                Catch exception As Exception
-                End Try
-            End If
-        Next
-        myProcessArray.Add("ciao")
-        Return myProcessArray
-    End Function
-
-    Public Shared Function Updater() As Boolean
+    Public Shared Sub Updater()
         If CheckForInternetConnection() = True Then
             Using client As New WebClient
                 latestversion = Decimal.Parse(client.DownloadString("http://geeksn0w.it/Beehind/latest-win.txt"), CultureInfo.InvariantCulture)
@@ -498,31 +571,15 @@ Public Class Common_Functions
         Else
             MainView.UpdateLabel.Text = "Beehind wasn't able to check for updates... Check your internet connection!"
         End If
-    End Function
-
-    Public Shared Function getControlFromName(ByRef containerObj As Object, _
-                         ByVal name As String) As Control
-        Try
-            Dim tempCtrl As Control
-            For Each tempCtrl In containerObj.Controls
-                If tempCtrl.Name.ToUpper.Trim = name.ToUpper.Trim Then
-                    Return tempCtrl
-                End If
-            Next tempCtrl
-        Catch ex As Exception
-        End Try
-    End Function
-
+    End Sub
 
     Public Shared Function IsDFUConnected()
         Dim forever As Boolean = True
-        Dim text1 As String = ""
-        text1 = " "
+        Dim text1 As String = " "
         Dim searcher As New ManagementObjectSearcher( _
                   "root\CIMV2", _
                   "SELECT * FROM Win32_PnPEntity WHERE Description = 'Apple Recovery (DFU) USB Driver'")
         For Each queryObj As ManagementObject In searcher.Get()
-
             text1 += (queryObj("Description"))
         Next
         If text1.Contains("DFU") Then
@@ -530,30 +587,21 @@ Public Class Common_Functions
         Else
             Return False
         End If
-        'Loop()
     End Function
 
     Public Shared Function IsRecoveryConnected()
-        'Dim DFUConnected As Boolean = False
-        'Dim forever As Boolean = True
-        Dim text1 As String = ""
-        'Do Until DFUConnected = True
-        'Delay(1)
-        text1 = " "
+        Dim text1 As String = " "
         Dim searcher As New ManagementObjectSearcher( _
                   "root\CIMV2", _
                   "SELECT * FROM Win32_PnPEntity WHERE Description = 'Apple Recovery (iBoot) USB Driver'")
         For Each queryObj As ManagementObject In searcher.Get()
-
             text1 += (queryObj("Description"))
         Next
         If text1.Contains("iBoot") Then
-            'DFUConnected = True
             Return True
         Else
             Return False
         End If
-        'Loop
     End Function
 
     Public Shared Function IsUserlandConnected()
@@ -565,7 +613,7 @@ Public Class Common_Functions
         For Each queryObj As ManagementObject In USBSearcher.Get()
             USBName += (queryObj("Description"))
         Next
-        If USBName = "Apple Mobile Device USB Driver" Then
+        If USBName.Contains("Apple Mobile Device USB Driver") Then
             Return True
         Else
             Return False

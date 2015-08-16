@@ -8,6 +8,23 @@ Imports Beehind.AddUntethers
 Public Class IMG3Patches
 
     Public Shared Sub PatchIBSS(DecryptedIBSS As String, outfile As String)
+        If iOSAsInteger() = 4 Then
+            If DeviceModel = "iPhone3,1" Then
+                HexPatchFile(DecryptedIBSS, outfile, "feffffea00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "feffffea04a213681b1c03d05068c8500832f8e77047c046d8037200ead10120e0d98c0030e000205cdb270001000000e4d98c0000202de0")
+                HexPatchFile(outfile, outfile, "fff773fe", "00200020")
+                HexPatchFile(outfile, outfile, "fff760fe", "00200020")
+                HexPatchFile(outfile, outfile, "fff7b6fe", "00200020")
+                HexPatchFile(outfile, outfile, "fff73afe", "00200020")
+                HexPatchFile(outfile, outfile, "fff729fe", "00200020")
+                HexPatchFile(outfile, outfile, "fff717fe", "00200020")
+                HexPatchFile(outfile, outfile, "fff705fe", "00200020")
+                HexPatchFile(outfile, outfile, "fff7f6fd", "00200020")
+                HexPatchFile(outfile, outfile, "fff7e4fd", "00200020")
+                HexPatchFile(outfile, outfile, "08f00d", "ecf74b")
+                HexPatchFile(outfile, outfile, "4ff0ff30", "00200020")
+            End If
+        End If
+
         If iOSAsInteger() = 5 Then
             If DeviceModel = "iPhone3,1" Then
                 'patches di ios 5.1.1 per iPhone 4
@@ -86,6 +103,12 @@ Public Class IMG3Patches
             End If
         End If
 
+        If iOSAsInteger() = 8 Then
+            If DeviceModel = "iPhone5,2" Then
+
+            End If
+        End If
+
     End Sub
     Public Shared Sub PatchIBEC(DecryptedIBEC As String, outfile As String)
         If iOSAsInteger() = 5 Then
@@ -130,7 +153,7 @@ Public Class IMG3Patches
                     HexPatchFile(outfile, outfile, "6110f09f", "00000080")
                 End If
             ElseIf DeviceModel = "iPhone5,2" Then
-                If iOS_Version = "6.1.4" Then
+                If iOS_Version = "6.1.4" Or iOS_Version = "6.1.2" Then
                     HexPatchFile(DecryptedIBEC, outfile, "feffffea00000000000000000000000000000000000000000000000000000000000000", "feffffea034a044bca50044a044bca507047000001207047181a4a00002000203e35a5")
                     HexPatchFile(outfile, outfile, "e8680028", "00200028")
                     HexPatchFile(outfile, outfile, "fff742fc", "00201860")
@@ -303,9 +326,17 @@ Public Class IMG3Patches
         hfsplus("""" + Infile + """" + " extract " + """" + "/usr/local/bin/restored_external" + """" + " " + """" + tempdir + "\ramdisk-patch\restored_external" + """")
         'hfsplus(Infile + " extract " + """" + "/usr/local/share/restore/options.plist" + """" + " " + """" + tempdir + "\ramdisk-patch\options.plist" + """")
         hfsplus("""" + Infile + """" + " extract " + """" + "/usr/local/share/restore/options." + KernelCacheName.Replace("\kernelcache.release.", "") + ".plist" + """" + " " + """" + tempdir + "\ramdisk-patch\options.plist" + """")
+
+
+        Dim OptionsPlistFileInfo As New FileInfo(tempdir + "\ramdisk-patch\options.plist")
+        Dim OptionsPlistSize As Long = OptionsPlistFileInfo.Length
+        If OptionsPlistSize = 0 Then
+            hfsplus(Infile + " extract " + """" + "/usr/local/share/restore/options.plist" + """" + " " + """" + tempdir + "\ramdisk-patch\options.plist" + """")
+        End If
+
         hfsplus("""" + Infile + """" + " rm " + """" + "/usr/sbin/asr" + """")
         hfsplus("""" + Infile + """" + " rm " + """" + "/usr/local/bin/restored_external" + """")
-        'hfsplus(Infile + " mv " + """" + "/usr/local/share/restore/options.plist" + """" + " " + """" + "/usr/local/share/restore/options.plist_orig" + """")
+        hfsplus(Infile + " rm " + """" + "/usr/local/share/restore/options.plist" + """")
         hfsplus("""" + Infile + """" + " rm " + """" + "/usr/local/share/restore/options." + KernelCacheName.Replace("\kernelcache.release.", "") + ".plist" + """")
         PatchOptionsPlist(tempdir + "\ramdisk-patch\options.plist")
         If OTADowngrade = False Then
@@ -313,7 +344,7 @@ Public Class IMG3Patches
         End If
         PatchASR(tempdir + "\ramdisk-patch\asr")
         hfsplus("""" + Infile + """" + " add " + """" + tempdir + "\ramdisk-patch\options.plist" + """" + " " + """" + "/usr/local/share/restore/options." + KernelCacheName.Replace("\kernelcache.release.", "") + ".plist" + """")
-        'hfsplus(Infile + " add " + """" + tempdir + "\ramdisk-patch\options.plist" + """" + " " + """" + "/usr/local/share/restore/options.plist" + """")
+        hfsplus(Infile + " add " + """" + tempdir + "\ramdisk-patch\options.plist" + """" + " " + """" + "/usr/local/share/restore/options.plist" + """")
         hfsplus("""" + Infile + """" + " add " + """" + tempdir + "\ramdisk-patch\asr" + """" + " " + """" + "/usr/sbin/asr" + """")
         hfsplus("""" + Infile + """" + " add " + """" + tempdir + "\ramdisk-patch\restored_external" + """" + " " + """" + "/usr/local/bin/restored_external" + """")
         hfsplus("""" + Infile + """" + " chmod 100755 " + """" + "/usr/sbin/asr" + """")
@@ -344,12 +375,15 @@ Public Class IMG3Patches
                 HexPatchFile(Infile, Infile, "20ce8a478dd3d43b0b672f4be88d96393e4abbd5", "bfc15bc96937ad99d2b22769e2dadd0019635730")
             End If
         End If
+
         If iOSAsInteger() = 7 Then
             If iOS_Version = "7.0.2" Then
-                HexPatchFile(Infile, Infile, "0000000016e0", "07f0d7fdb0b9")
-                HexPatchFile(Infile, Infile, "0000002846", "f095802846")
-                HexPatchFile(Infile, Infile, "d0f8ac6a9c1220186a223dbf301e4392ec2f005b", "cccc0f2c1cda4c423933527696c706f34cc87871")
-                HexPatchFile(Infile, Infile, "e78e17fb85d58917c49ac87383a8c1eff37ee017", "53c5706d829dc7be4f79133e20d0ffaae9ade874")
+                If DeviceModel = "iPhone3,1" Then
+                    HexPatchFile(Infile, Infile, "07f0d7fdb0b9", "0000000016e0")
+                    HexPatchFile(Infile, Infile, "f0958028", "00000028")
+                    HexPatchFile(Infile, Infile, "cccc0f2c1cda4c423933527696c706f34cc87871", "00000028d0f8ac6a9c1220186a223dbf301e4392ec2f005b")
+                    HexPatchFile(Infile, Infile, "53c5706d829dc7be4f79133e20d0ffaae9ade874", "e78e17fb85d58917c49ac87383a8c1eff37ee017")
+                End If
             ElseIf iOS_Version = "7.1.2" Then
                 If DeviceModel = "iPhone3,1" Or DeviceModel = "iPhone4,1" Or DeviceModel = "iPad2,1" Or DeviceModel = "iPad3,1" Then
                     HexPatchFile(Infile, Infile, "07f031ffb0b9", "0000000016e0")
@@ -364,6 +398,8 @@ Public Class IMG3Patches
     Public Shared Sub PatchASR(Infile As String)
         If iOSAsInteger() = 4 Then
             'old man
+            HexPatchFile(Infile, Infile, "dff8e000", "fdf7e000")
+            HexPatchFile(Infile, Infile, "edb76caad3afa0b490086d635146170b8a408dc4", "6edb54d3db60a8fb744728eb0233eafa20b67eb5")
         ElseIf iOSAsInteger() = 5 Then
             HexPatchFile(Infile, Infile, "20460ff0c0eb4df2", "20460ff0c0ebf5e7")
             HexPatchFile(Infile, Infile, "fd4adfb2c6b19a721cbb80e0d97e8bc43261219a", "f693b6c74f33e1bae29dbc301b81ded20d651076")
@@ -373,7 +409,7 @@ Public Class IMG3Patches
         ElseIf iOSAsInteger() = 7 Then
             'ios 7.0.2 (and 7.0 and 7.0.1)
 
-            If iOS_Version = "7.0" Or iOS_Version = "7.0.1" Then
+            If iOS_Version = "7.0" Or iOS_Version = "7.0.1" Or iOS_Version = "7.0.2" Then
                 If DeviceModel = "iPhone3,1" Then
                     HexPatchFile(Infile, Infile, "4df6e240", "3ae0e240")
                     HexPatchFile(Infile, Infile, "4c90b03e1e547ebfeae5cba04280ba858f6878e9", "67d37f9f4ce120a9b6be4eb48ff0938e22745481")

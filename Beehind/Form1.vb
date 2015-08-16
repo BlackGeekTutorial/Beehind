@@ -4,10 +4,6 @@ Imports System.IO
 Imports Beehind.Common_Definitions
 Imports Beehind.ProcessUtilities
 
-
-
-
-
 Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -47,7 +43,6 @@ Public Class Form1
         MainView.MdiParent = Me
         MainView.Show()
         KloaderInjector.Close()
-        pwntunes.Close()
         Restore.Close()
         idevicerestoreGUI.Close()
     End Sub
@@ -56,16 +51,6 @@ Public Class Form1
         KloaderInjector.MdiParent = Me
         KloaderInjector.Show()
         MainView.Close()
-        pwntunes.Close()
-        Restore.Close()
-        idevicerestoreGUI.Close()
-    End Sub
-
-    Private Sub DATunesModeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DATunesModeToolStripMenuItem.Click
-        pwntunes.MdiParent = Me
-        pwntunes.Show()
-        MainView.Close()
-        KloaderInjector.Close()
         Restore.Close()
         idevicerestoreGUI.Close()
     End Sub
@@ -76,7 +61,6 @@ Public Class Form1
         idevicerestoreGUI.Close()
         MainView.Close()
         KloaderInjector.Close()
-        pwntunes.Close()
     End Sub
 
     Private Sub AboutBeehindToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutBeehindToolStripMenuItem.Click
@@ -92,7 +76,7 @@ Public Class Form1
     End Sub
 
     Private Sub CreditsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreditsToolStripMenuItem.Click
-        MessageBox.Show("Beehind has been developed by Andrea Bentivega (@blackgeektuto)" + Environment.NewLine + Environment.NewLine + "Thanks to:" + Environment.NewLine + "@winocm - for kloader and ios-kexec-utils" + Environment.NewLine + "@geohot - for limera1n exploit" + Environment.NewLine + "@pimskeks - for libimobiledevice and idevicerestore source code" + Environment.NewLine + "@Elro74 - for helping in compiling idevicerestore for Windows" + Environment.NewLine + "@taig_Jailbreak - for iOS 8.x Untether Payload" + Environment.NewLine + "@PanguTeam - for iOS 7.1.x Untether Payload" + Environment.NewLine + "@evad3rs - for iOS 7.0.x and 6.0-6.1.2 Untether Payload" + Environment.NewLine + "@iH8Sn0w, @squiffy and @winocm - for iOS 6.1.3-6.1.6 Untether Payload", "Credits/Thanks to:",
+        MessageBox.Show("Beehind has been developed by Andrea Bentivegna (@blackgeektuto)" + Environment.NewLine + Environment.NewLine + "Thanks to:" + Environment.NewLine + "@winocm - for kloader and ios-kexec-utils" + Environment.NewLine + "@geohot - for limera1n exploit" + Environment.NewLine + "@pimskeks - for libimobiledevice and idevicerestore source code" + Environment.NewLine + "@Elro74 - for helping in compiling idevicerestore for Windows" + Environment.NewLine + "@taig_Jailbreak - for iOS 8.x Untether Payload" + Environment.NewLine + "@PanguTeam - for iOS 7.1.x Untether Payload" + Environment.NewLine + "@evad3rs - for iOS 7.0.x and 6.0-6.1.2 Untether Payload" + Environment.NewLine + "@iH8Sn0w, @squiffy and @winocm - for iOS 6.1.3-6.1.6 Untether Payload", "Credits/Thanks to:",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
 
@@ -102,6 +86,9 @@ Public Class Form1
         Restore.Close()
         MainView.Close()
         KloaderInjector.Close()
-        pwntunes.Close()
+    End Sub
+
+    Private Sub SeeXPWNOnGitHubToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SeeXPWNOnGitHubToolStripMenuItem.Click
+        Process.Start("https://github.com/planetbeing/xpwn")
     End Sub
 End Class

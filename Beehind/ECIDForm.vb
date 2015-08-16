@@ -6,8 +6,6 @@ Imports Beehind.ECIDManagement
 Imports Beehind.Processes
 Imports System.Management
 
-
-
 Public Class ECIDForm
 
     Private Sub ECIDConfirmBtn_Click(sender As Object, e As EventArgs) Handles ECIDConfirmBtn.Click

@@ -122,7 +122,7 @@
 All the known keys have been published on theiPhoneWiki, but there're very few for newer devices (iPhone 5/5C).
 Once newer keys will be discovered, I'll push an update for Beehind with exetended compatibility. So it's really important that you always run the latest
 version of Beehind!
-WARNING: Installing a Custom Firmware via Beehind could corrupt your Baseband Firmware and compromise the  Cellular part of your  device</value>
+WARNING: Installing a Custom Firmware via Beehind could corrupt your Baseband Firmware and compromise the Cellular part of your device</value>
   </data>
   <metadata name="IPSWFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
@@ -135,6 +135,9 @@ WARNING: Installing a Custom Firmware via Beehind could corrupt your Baseband Fi
   </metadata>
   <metadata name="OpenFileDialog1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>445, 17</value>
+  </metadata>
+  <metadata name="MD5CheckerBW.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>587, 3</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>25</value>

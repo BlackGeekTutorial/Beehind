@@ -1,5 +1,6 @@
 ﻿Imports System.Xml
 Imports Beehind.Processes
+Imports Beehind.XML
 
 Public Class RestoreClass
 

@@ -6,7 +6,6 @@ Imports Beehind.RestoreClass
 Imports Beehind.SignIMG3
 Imports System.Xml
 
-
 Public Class Restore
 
     Public Shared Sub AddLineToRestoreConsole(Text As String)

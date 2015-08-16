@@ -36,17 +36,22 @@ Public Class Processes
         Loop
     End Sub
 
-    Public Shared Sub imagetool(extract As Boolean, infile As String, outfile As String, Optional template As String = "")
+    Public Shared Sub imagetool(extract As Boolean, infile As String, outfile As String, IV As String, K As String, Optional template As String = "")
+        Dim ivk As String = String.Empty
+        If IV <> "" And K <> "" Then
+            ivk = " " + IV + " " + K
+        End If
         Dim imagetool_p As New Process()
         Try
             imagetool_p.StartInfo.UseShellExecute = False
             imagetool_p.StartInfo.FileName = tempdir + "\imagetool.exe"
             imagetool_p.StartInfo.CreateNoWindow = True
             If extract = True Then
-                imagetool_p.StartInfo.Arguments = "extract " + """" + infile + """" + " " + """" + outfile + """"
+                imagetool_p.StartInfo.Arguments = "extract " + """" + infile + """" + " " + """" + outfile + """" + ivk
             ElseIf extract = False Then
-                imagetool_p.StartInfo.Arguments = "inject " + """" + infile + """" + " " + """" + outfile + """" + " " + """" + template + """"
+                imagetool_p.StartInfo.Arguments = "inject " + """" + infile + """" + " " + """" + outfile + """" + " " + """" + template + """" + ivk
             End If
+            MessageBox.Show(imagetool_p.StartInfo.Arguments)
             imagetool_p.Start()
         Catch ex As Exception
         End Try

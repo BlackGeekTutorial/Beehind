@@ -31,10 +31,11 @@ Partial Class Form1
         Me.SelectModeMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.IPSWCreatorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.KloaderModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.DATunesModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RestoreModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.IdevicerestoreModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CreditsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.OriginalXPWNSourceToolStripMenuItem = New System.Windows.Forms.ToolStripSeparator()
+        Me.SeeXPWNOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BeehindMenuStrip.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -49,7 +50,7 @@ Partial Class Form1
         '
         'InfoMenuItem
         '
-        Me.InfoMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutBeehindToolStripMenuItem, Me.FollowMeToolStripMenuItem, Me.DonationsToolStripMenuItem})
+        Me.InfoMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutBeehindToolStripMenuItem, Me.FollowMeToolStripMenuItem, Me.DonationsToolStripMenuItem, Me.OriginalXPWNSourceToolStripMenuItem, Me.SeeXPWNOnGitHubToolStripMenuItem})
         Me.InfoMenuItem.Name = "InfoMenuItem"
         Me.InfoMenuItem.Size = New System.Drawing.Size(40, 20)
         Me.InfoMenuItem.Text = "Info"
@@ -57,24 +58,24 @@ Partial Class Form1
         'AboutBeehindToolStripMenuItem
         '
         Me.AboutBeehindToolStripMenuItem.Name = "AboutBeehindToolStripMenuItem"
-        Me.AboutBeehindToolStripMenuItem.Size = New System.Drawing.Size(153, 22)
+        Me.AboutBeehindToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.AboutBeehindToolStripMenuItem.Text = "About Beehind"
         '
         'FollowMeToolStripMenuItem
         '
         Me.FollowMeToolStripMenuItem.Name = "FollowMeToolStripMenuItem"
-        Me.FollowMeToolStripMenuItem.Size = New System.Drawing.Size(153, 22)
+        Me.FollowMeToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.FollowMeToolStripMenuItem.Text = "Follow Me"
         '
         'DonationsToolStripMenuItem
         '
         Me.DonationsToolStripMenuItem.Name = "DonationsToolStripMenuItem"
-        Me.DonationsToolStripMenuItem.Size = New System.Drawing.Size(153, 22)
+        Me.DonationsToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.DonationsToolStripMenuItem.Text = "Donations :)"
         '
         'SelectModeMenuItem
         '
-        Me.SelectModeMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IPSWCreatorToolStripMenuItem, Me.KloaderModeToolStripMenuItem, Me.DATunesModeToolStripMenuItem, Me.RestoreModeToolStripMenuItem, Me.IdevicerestoreModeToolStripMenuItem})
+        Me.SelectModeMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IPSWCreatorToolStripMenuItem, Me.KloaderModeToolStripMenuItem, Me.RestoreModeToolStripMenuItem, Me.IdevicerestoreModeToolStripMenuItem})
         Me.SelectModeMenuItem.Name = "SelectModeMenuItem"
         Me.SelectModeMenuItem.Size = New System.Drawing.Size(84, 20)
         Me.SelectModeMenuItem.Text = "Select Mode"
@@ -90,13 +91,6 @@ Partial Class Form1
         Me.KloaderModeToolStripMenuItem.Name = "KloaderModeToolStripMenuItem"
         Me.KloaderModeToolStripMenuItem.Size = New System.Drawing.Size(181, 22)
         Me.KloaderModeToolStripMenuItem.Text = "Kloader Mode"
-        '
-        'DATunesModeToolStripMenuItem
-        '
-        Me.DATunesModeToolStripMenuItem.Name = "DATunesModeToolStripMenuItem"
-        Me.DATunesModeToolStripMenuItem.Size = New System.Drawing.Size(181, 22)
-        Me.DATunesModeToolStripMenuItem.Text = "DATunes Mode"
-        Me.DATunesModeToolStripMenuItem.Visible = False
         '
         'RestoreModeToolStripMenuItem
         '
@@ -117,6 +111,17 @@ Partial Class Form1
         Me.CreditsToolStripMenuItem.Size = New System.Drawing.Size(56, 20)
         Me.CreditsToolStripMenuItem.Text = "Credits"
         '
+        'OriginalXPWNSourceToolStripMenuItem
+        '
+        Me.OriginalXPWNSourceToolStripMenuItem.Name = "OriginalXPWNSourceToolStripMenuItem"
+        Me.OriginalXPWNSourceToolStripMenuItem.Size = New System.Drawing.Size(184, 6)
+        '
+        'SeeXPWNOnGitHubToolStripMenuItem
+        '
+        Me.SeeXPWNOnGitHubToolStripMenuItem.Name = "SeeXPWNOnGitHubToolStripMenuItem"
+        Me.SeeXPWNOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.SeeXPWNOnGitHubToolStripMenuItem.Text = "See XPWN on GitHub"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -130,7 +135,7 @@ Partial Class Form1
         Me.MaximizeBox = False
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Beehind - kloader's GUI - BETA (v. 0.2)"
+        Me.Text = "Beehind - kloader's GUI - BETA (v. 0.3)"
         Me.BeehindMenuStrip.ResumeLayout(False)
         Me.BeehindMenuStrip.PerformLayout()
         Me.ResumeLayout(False)
@@ -142,12 +147,13 @@ Partial Class Form1
     Friend WithEvents SelectModeMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents IPSWCreatorToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents KloaderModeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents DATunesModeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents RestoreModeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AboutBeehindToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents FollowMeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents DonationsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CreditsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents IdevicerestoreModeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents OriginalXPWNSourceToolStripMenuItem As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents SeeXPWNOnGitHubToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class
