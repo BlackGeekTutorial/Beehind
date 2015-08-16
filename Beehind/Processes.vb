@@ -51,7 +51,7 @@ Public Class Processes
             ElseIf extract = False Then
                 imagetool_p.StartInfo.Arguments = "inject " + """" + infile + """" + " " + """" + outfile + """" + " " + """" + template + """" + ivk
             End If
-            MessageBox.Show(imagetool_p.StartInfo.Arguments)
+            'MessageBox.Show(imagetool_p.StartInfo.Arguments)
             imagetool_p.Start()
         Catch ex As Exception
         End Try
