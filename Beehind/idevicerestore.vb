@@ -13,20 +13,28 @@ Public Class idevicerestoreGUI
 
     Public RestoreArguments As String = String.Empty
 
-    Public Shared Function IsThisIPSWPreSigned(IPSWPath)
+    Public Shared Function IsThisIPSWOTA(IPSWPath)
         InfoZipUnzip("""" + IPSWPath + """" + " " + """" + "Beehind.xml" + """" + " -d " + """" + tempdir + "\Restore" + """")
         If File.Exists(tempdir + "\Restore\Beehind.xml") = False Then
             MessageBox.Show("File 'Beehind.xml' NOT found! IPSW could be corrupted or it has been created with an outdated version of Beehind. Please, re-create it with this current version.", "Missing 'Beehind.xml'", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Exit Function
         End If
-        Dim IsPreSigned As String = GetTextFromXMLItem(tempdir + "\Restore\Beehind.xml", 3, "Pre-Signed", "Pre-Signed")
+        Dim IsOTA As String = GetTextFromXMLItem(tempdir + "\Restore\Beehind.xml", 3, "OTA Downgrade", "OTA Downgrade")
         Delete(False, tempdir + "\Restore\Beehind.xml")
-        If IsPreSigned = "false" Then
+        If IsOTA = "false" Then
             Return False
-        ElseIf IsPreSigned = "true" Then
+        ElseIf IsOTA = "true" Then
             Return True
         Else
             MessageBox.Show("ERROR: Beehind wasn't able to determinate the IPSW type.. Are you sure it's valid? Maybe you've created it with an older version of Beehind; if yes, please, re-create it with the current version!", "Plist reading fail", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
+    End Function
+
+    Public Shared Function ExtractSHSHFromIPSW(IPSWPath As String, outdir As String)
+        InfoZipUnzip("""" + IPSWPath + """" + " " + """" + "shsh/*" + """" + " -d " + """" + outdir + """")
+        If Directory.Exists(outdir) = False Then
+            MessageBox.Show("ERROR: Failed to extract shsh folder! IPSW could be corrupted or it has been created with an outdated version of Beehind. Please, re-create it with this current version.", "Missing 'Beehind.xml'", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Exit Function
         End If
     End Function
 
@@ -41,19 +49,23 @@ Public Class idevicerestoreGUI
     End Sub
 
     Private Sub RestoreButton_Click(sender As Object, e As EventArgs) Handles RestoreButton.Click
+
         Kill({"iTunes", "idevicerestore", "iTunesHelper"})
         Dim iTunesHelper As Process() = Process.GetProcessesByName("iTunesHelper")
         'SuspendProcess(iTunesHelper(0))
-        Dim BeehindMode As Boolean = IsThisIPSWPreSigned(IPSWPathTextBox.Text)
+        Dim OTA As Boolean = IsThisIPSWOTA(IPSWPathTextBox.Text)
 
-        If BeehindMode = True Then
-            RestoreArguments = "--avoidsign " + """" + IPSWPathTextBox.Text + """"
+        If OTA = False Then
+            CreateDirectory(tempdir, "\Restore", True)
+            ExtractSHSHFromIPSW(IPSWPathTextBox.Text, tempdir + "/Restore/")
+            RestoreArguments = "-w " + """" + IPSWPathTextBox.Text + """"
             idevicerestore(RestoreArguments, True)
-        ElseIf BeehindMode = False Then
+        ElseIf OTA = True Then
             RestoreArguments = "-e " + """" + IPSWPathTextBox.Text + """"
             idevicerestore(RestoreArguments, False)
         End If
         'ResumeProcess(iTunesHelper(0))
+
     End Sub
 
     Private Sub BrowseIPSWButtin_Click(sender As Object, e As EventArgs) Handles BrowseIPSWButtin.Click

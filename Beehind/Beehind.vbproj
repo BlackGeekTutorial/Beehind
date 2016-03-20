@@ -48,6 +48,7 @@
   <PropertyGroup>
     <ApplicationIcon>beehind.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -86,6 +87,12 @@
     <Compile Include="Common Definitions.vb" />
     <Compile Include="Common Functions.vb" />
     <Compile Include="Digests.vb" />
+    <Compile Include="dm.Designer.vb">
+      <DependentUpon>dm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="dm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ECIDForm.Designer.vb">
       <DependentUpon>ECIDForm.vb</DependentUpon>
     </Compile>
@@ -110,7 +117,18 @@
     <Compile Include="IMG3Patches.vb" />
     <Compile Include="IPSW URLs.vb" />
     <Compile Include="IPSW MD5s.vb" />
-    <Compile Include="keys.vb" />
+    <Compile Include="iTunesRestore.Designer.vb">
+      <DependentUpon>iTunesRestore.vb</DependentUpon>
+    </Compile>
+    <Compile Include="iTunesRestore.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="keys.Designer.vb">
+      <DependentUpon>keys.vb</DependentUpon>
+    </Compile>
+    <Compile Include="keys.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="KloaderInjector.Designer.vb">
       <DependentUpon>KloaderInjector.vb</DependentUpon>
     </Compile>
@@ -148,11 +166,20 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="RestoreClass.vb" />
+    <Compile Include="Save-SHSH.Designer.vb">
+      <DependentUpon>Save-SHSH.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Save-SHSH.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="SHSH.vb" />
     <Compile Include="SignIMG3.vb" />
     <Compile Include="XML.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="dm.resx">
+      <DependentUpon>dm.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ECIDForm.resx">
       <DependentUpon>ECIDForm.vb</DependentUpon>
     </EmbeddedResource>
@@ -161,6 +188,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="idevicerestore.resx">
       <DependentUpon>idevicerestore.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="iTunesRestore.resx">
+      <DependentUpon>iTunesRestore.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="keys.resx">
+      <DependentUpon>keys.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="KloaderInjector.resx">
       <DependentUpon>KloaderInjector.vb</DependentUpon>
@@ -177,6 +210,9 @@
     <EmbeddedResource Include="Restore.resx">
       <DependentUpon>Restore.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Save-SHSH.resx">
+      <DependentUpon>Save-SHSH.vb</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="My Project\Application.myapp">
@@ -192,8 +228,56 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="beehind.ico" />
-    <None Include="Resources\beehind-resources.zip" />
+    <None Include="Resources\beehind-resources.rar" />
+    <None Include="Resources\beehind_resources.rar" />
     <None Include="Resources\sound-completed.wav" />
+    <None Include="Resources\iphone5c_blue.png" />
+    <None Include="Resources\iphone5c_green.png" />
+    <None Include="Resources\iphone5c_rose.png" />
+    <None Include="Resources\iphone5c_white.png" />
+    <None Include="Resources\iphone5c_yellow.png" />
+    <None Include="Resources\iphone5s_gold.png" />
+    <None Include="Resources\iphone5s_silver.png" />
+    <None Include="Resources\iphone5s_spacegrey.png" />
+    <None Include="Resources\iphone6-6s-_gold.png" />
+    <None Include="Resources\iphone6-6s-_rosegold.png" />
+    <None Include="Resources\iphone6-6s-_silver.png" />
+    <None Include="Resources\iphone6-6s-_spacegrey.png" />
+    <None Include="Resources\iphone66s_gold.png" />
+    <None Include="Resources\iphone66s_rosegold.png" />
+    <None Include="Resources\iphone66s_silver.png" />
+    <None Include="Resources\iphone66s_spacegrey.png" />
+    <None Include="Resources\iphone5_black.png" />
+    <None Include="Resources\iphone5_silver.png" />
+    <None Include="Resources\lightning-gradient.png" />
+    <None Include="Resources\unrar.exe" />
+    <None Include="Resources\iphoe44s_black.png" />
+    <None Include="Resources\iphoe44s_white.png" />
+    <None Include="Resources\30pin-gradient.png" />
+    <None Include="Resources\ipod4_black.png" />
+    <None Include="Resources\ipod4_white.png" />
+    <None Include="Resources\ipadpro_gold.png" />
+    <None Include="Resources\ipadpro_spacegrey.png" />
+    <None Include="Resources\ipadpro_white.png" />
+    <None Include="Resources\iphone4_white.png" />
+    <None Include="Resources\iphone4_black.png" />
+    <None Include="Resources\atv4.png" />
+    <None Include="Resources\ipad1.png" />
+    <None Include="Resources\ipad234_black.png" />
+    <None Include="Resources\ipad234_white.png" />
+    <None Include="Resources\iphone3gs.png" />
+    <None Include="Resources\ipadmini12_white.png" />
+    <None Include="Resources\ipadmini34_silver.png" />
+    <None Include="Resources\ipadmini34_spacegrey.png" />
+    <None Include="Resources\ipadmini12_black.png" />
+    <None Include="Resources\ipadair2_spacegrey.png" />
+    <None Include="Resources\ipod5_black.png" />
+    <None Include="Resources\ipod5_white.png" />
+    <None Include="Resources\ipod6_spacegrey.png" />
+    <None Include="Resources\ipod6_white.png" />
+    <None Include="Resources\ipadair1_silver.png" />
+    <None Include="Resources\ipadair1_spacegrey.png" />
+    <None Include="Resources\ipadair2_silver.png" />
     <Content Include="Resources\WinSCPnet.dll" />
     <None Include="Resources\unzip.exe" />
   </ItemGroup>

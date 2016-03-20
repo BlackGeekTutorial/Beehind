@@ -17,12 +17,15 @@ Imports System.Management
 Imports Beehind.KloaderInjector
 Imports Beehind.SHSH
 Imports Beehind.iFaithMode
+Imports System.Globalization
+Imports System.Threading
+Imports Microsoft.Win32
 
 Public Class MainView
 
     Private Sub BasebandCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles BasebandCheckBox.CheckedChanged
         If BasebandCheckBox.Checked = True Then
-            If OTADowngrade = True Then
+            If DowngradeType = "OTA" Then
                 MessageBox.Show("Refusing to add another baseband since it makes no sense if you're doing an OTA Downgrade...", "No Baseband.tar",
                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 BasebandCheckBox.Checked = False
@@ -60,18 +63,9 @@ Public Class MainView
 
             'IPSW has been given
             IPSWGroupBox.Text = "Analyzing IPSW..."
-            MD5CheckerBW.RunWorkerAsync()
-            Do Until MD5CheckerBW.IsBusy = False
-                Delay(1)
-            Loop
-            If Beehind.Betashit.IsRelease = True Then
-                If Not Beehind.Betashit.Beta1SupportedCombox.Contains(iOS_Version + DeviceModel) Then
-                    MessageBox.Show(Beehind.Betashit.Beta1LIMITEDMessage, "BETA LIMITED",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    Reset()
-                    Exit Sub
-                End If
-            End If
+
+            IdentifyIPSW(IPSWFileDialog.FileName)
+            
             If iOS_Version = "" Then
                 MessageBox.Show("This IPSW (md5: " + IPSWMD5 + ") is not supported by this version of Beehind", "IPSW Unrecognized",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -86,7 +80,6 @@ Public Class MainView
                         OTADGForum()
                     End If
                 End If
-
 
                 If Beehind.Betashit.IsRelease = True Then
                     ExploitType = "kloader"
@@ -105,11 +98,11 @@ Public Class MainView
                         End If
                     Else
                         ExploitType = "kloader"
-                        
-                        End If
+
+                    End If
                 End If
 
-                If OTADowngrade = False And TetheredDowngrade = False Then
+                If DowngradeType <> "OTA" And DowngradeType <> "NOSIGN" Then
                     SHSHGroupBox.Text = "Browse for '" + DeviceModel + "_" + iOS_Version + "_" + iOS_Build + "' SHSH Blobs"
                     ChooseSHSHButton.Enabled = True
                 End If
@@ -148,9 +141,9 @@ Public Class MainView
                 File.Copy(SHSHPath, tempdir + "\shsh.xml")
             End If
 
-            If File.ReadAllText(tempdir + "\shsh.xml").Contains("<key>Erase</key>") Or File.ReadAllText(tempdir + "\shsh.xml").Contains("<key>OTA</key>") Or File.ReadAllText(tempdir + "\shsh.xml").Contains("<key>Update</key>") Then
+            If File.ReadAllText(SHSHPath).Contains("<key>Erase</key>") Or File.ReadAllText(SHSHPath).Contains("<key>OTA</key>") Or File.ReadAllText(SHSHPath).Contains("<key>Update</key>") Then
                 ' New SHSH, have to extract all the blobs...
-                SplitNewSHSH(tempdir + "\shsh.xml", tempdir, "\shsh-extracted")
+                SplitNewSHSH(SHSHPath, tempdir, "\shsh-extracted")
                 MessageBox.Show("The given SHSH file contains " + Directory.GetFiles(tempdir + "\shsh-extracted").Length.ToString + " different certificates. Please, choose one to use with Beehind!", "TinyUmbrella 8 format detected", MessageBoxButtons.OK, MessageBoxIcon.Information)
 FileCheck:
                 For Each File In Directory.GetFiles(tempdir + "\shsh-extracted")
@@ -173,9 +166,9 @@ FileCheck:
                 XMLPath = tempdir + "\shsh.xml"
             End If
 
-            FillBlobsSet(iOSAsInteger)
+            FillBlobsSet(iOSAsInteger(iOS_Version))
         End If
-        If OTADowngrade = False Then
+        If DowngradeType <> "OTA" Then
             'getting ECID
             If BlobBackup <> "" Then
                 ECIDParser(GrabECIDFromBase64Blob(BlobBackup))
@@ -257,70 +250,74 @@ FileCheck:
             Delete(False, tempdir + "\IPSW" + rootfsName)
         End If
 
-        If OTADowngrade = True Then
+        If DowngradeType = "OTA" Then
             Delete(False, tempdir + "\IPSW\BuildManifest.plist")
             FileCopy(tempdir + "\BuildManifests\" + DeviceModel + "_" + iOS_Version + "_" + iOS_Build + "_OTAManifest.plist", tempdir + "\IPSW\BuildManifest.plist")
         Else
             PatchBuildManifest(tempdir + "\IPSW\BuildManifest.plist")
         End If
         '<----------------------------------------- iBSS patch ------------------------------------------------->
-            DowngradeProgressBar.Value = 15
-            ProgressLabel.Text = "15% - Preparing iBSS for " + ExploitType + "..."
-            If ExploitType = "kloader" Then
-                xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBSSName, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace("dfu", "d"), CurrentIBSSIV, CurrentIBSSKey, True)
-                PatchIBSS(tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace("dfu", "d"), tempdir + "\IPSW\Firmware\dfu" + iBSSName)
-                Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace("dfu", "d"))
-            ElseIf ExploitType = "limera1n" Then
-                xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBSSName, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".arm"), CurrentIBSSIV, CurrentIBSSKey, False)
-                PatchIBSS(tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".arm"), tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".patched"))
-                Rename(tempdir + "\IPSW\Firmware\dfu" + iBSSName, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".original"))
+        DowngradeProgressBar.Value = 15
+        ProgressLabel.Text = "15% - Preparing iBSS for " + ExploitType + "..."
+
+        xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBSSName, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".arm"), CurrentIBSSIV, CurrentIBSSKey, False)
+        bspatch(tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".arm"), tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".patched"), bundlesdir + "\Down_" + DeviceModel + "_" + iOS_Version + "_" + iOS_Build + ".bundle\iBSS." + DeviceClass + ".RELEASE.patch")
+        Rename(tempdir + "\IPSW\Firmware\dfu" + iBSSName, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".original"))
+        If ExploitType = "kloader" Then
+            xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".patched"), tempdir + "\IPSW\Firmware\dfu" + iBSSName, "", "", False, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".original"))
+        ElseIf ExploitType = "limera1n" Then
             xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".patched"), tempdir + "\IPSW\Firmware\dfu" + iBSSName, CurrentIBSSIV, CurrentIBSSKey, False, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".original"))
-                Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".original"))
-                Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".arm"))
-                Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".patched"))
-            End If
-            '<---------------------------------------------------------------------------------------------------------------->
+        End If
+        Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".original"))
+        Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".arm"))
+        Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBSSName.Replace(".dfu", ".patched"))
 
-            '<----------------------------------------- iBEC patch ------------------------------------------------->
-            DowngradeProgressBar.Value = 20
+        '<----------------------------------------- iBEC patch ------------------------------------------------->
+        DowngradeProgressBar.Value = 20
         ProgressLabel.Text = "20% - Preparing iBEC for " + ExploitType + "..."
-            If iOSAsInteger() > 4 Then
-                If ExploitType = "kloader" Then
-                    xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBECName, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace("dfu", "d"), CurrentIBECIV, CurrentIBECKey, True)
-                    PatchIBEC(tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace("dfu", "d"), tempdir + "\IPSW\Firmware\dfu" + iBECName)
-                    Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace("dfu", "d"))
-                ElseIf ExploitType = "limera1n" Then
-                    xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBECName, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".arm"), CurrentIBECIV, CurrentIBECKey, False)
-                    PatchIBEC(tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".arm"), tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".patched"))
-                    Rename(tempdir + "\IPSW\Firmware\dfu" + iBECName, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".original"))
+        If iOSAsInteger(iOS_Version) > 4 Then
+            xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBECName, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".arm"), CurrentIBECIV, CurrentIBECKey, False)
+            bspatch(tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".arm"), tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".patched"), bundlesdir + "\Down_" + DeviceModel + "_" + iOS_Version + "_" + iOS_Build + ".bundle\iBEC." + DeviceClass + ".RELEASE.patch")
+            Rename(tempdir + "\IPSW\Firmware\dfu" + iBECName, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".original"))
+            If ExploitType = "kloader" Then
+                xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".patched"), tempdir + "\IPSW\Firmware\dfu" + iBECName, "", "", False, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".original"))
+            ElseIf ExploitType = "limera1n" Then
                 xpwntool(tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".patched"), tempdir + "\IPSW\Firmware\dfu" + iBECName, CurrentIBECIV, CurrentIBECKey, False, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".original"))
-                    Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".original"))
-                    Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".arm"))
-                    Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".patched"))
-                End If
-            Else
-                Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBECName)
             End If
-            '<---------------------------------------------------------------------------------------------------------------->
+            Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".original"))
+            Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".arm"))
+            Delete(False, tempdir + "\IPSW\Firmware\dfu" + iBECName.Replace(".dfu", ".patched"))
+        End If
 
-            '<---------------------------------------------------- AppleLogo Stuff ---------------------------------------------->
-            DowngradeProgressBar.Value = 25
+        '<---------------------------------------------------- AppleLogo Stuff ---------------------------------------------->
+        DowngradeProgressBar.Value = 25
         ProgressLabel.Text = "25% - Preparing RestoreLogo for " + ExploitType + "..."
         If ExploitType = "kloader" Then
-            imagetool(False, tempdir + "\restore-images\images-2x\applelogo.png", tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName.Replace("applelogo", "RestoreLogo_applelogo"), "", "", tempdir + "\restore-images\logo-template.img3")
+            If DowngradeType = "OTA" Then
+                imagetool(False, tempdir + "\restore-images\images-2x\applelogo.png", tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName.Replace("applelogo", "RestoreLogo_applelogo"), "", "", tempdir + "\restore-images\logo-template.img3")
+            Else
+                'will need to swap once in restore mode
+                Rename(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName, tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName + ".toflash")
+                imagetool(False, tempdir + "\restore-images\images-2x\applelogo.png", tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName, "", "", tempdir + "\restore-images\logo-template.img3")
+            End If
         ElseIf ExploitType = "limera1n" Then
             imagetool(False, tempdir + "\restore-images\images-2x\applelogo.png", tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName.Replace("applelogo", "RestoreLogo_applelogo"), CurrentAppleLogoIV, CurrentAppleLogoKey, tempdir + "\restore-images\logo-template.img3")
         End If
-        If NoNANDFlashCheckBox.Checked = True Then
-            Delete(False, tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName)
-        End If
-        '<---------------------------------------------------------------------------------------------------------------->
+            If NoNANDFlashCheckBox.Checked = True Then
+                Delete(False, tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName)
+            End If
+            '<---------------------------------------------------------------------------------------------------------------->
 
-        '<---------------------------------------------------- DeviceTree Stuff ---------------------------------------------->
-        DowngradeProgressBar.Value = 30
-        ProgressLabel.Text = "30% - Preparing DeviceTree for " + ExploitType + "..."
+            '<---------------------------------------------------- DeviceTree Stuff ---------------------------------------------->
+            DowngradeProgressBar.Value = 30
+            ProgressLabel.Text = "30% - Preparing DeviceTree for " + ExploitType + "..."
         If ExploitType = "kloader" Then
-            xpwntool(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName, tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName.Replace("DeviceTree", "RestoreDeviceTree_DeviceTree"), CurrentDeviceTreeIV, CurrentDeviceTreeKey, True)
+            If DowngradeType = "OTA" Then
+                xpwntool(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName, tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName.Replace("DeviceTree", "RestoreDeviceTree_DeviceTree"), CurrentDeviceTreeIV, CurrentDeviceTreeKey, True)
+            Else
+                Rename(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName, tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName + ".toflash")
+                xpwntool(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName + ".toflash", tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName, CurrentDeviceTreeIV, CurrentDeviceTreeKey, True)
+            End If
         ElseIf ExploitType = "limera1n" Then
             FileCopy(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName, tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + DeviceTreeName.Replace("DeviceTree", "RestoreDeviceTree_DeviceTree"))
         End If
@@ -334,7 +331,12 @@ FileCheck:
         DowngradeProgressBar.Value = 35
         ProgressLabel.Text = "35% - Preparing Kernel for " + ExploitType + "..."
         If ExploitType = "kloader" Then
-            xpwntool(tempdir + "\IPSW" + KernelCacheName, tempdir + "\IPSW" + KernelCacheName.Replace("kernelcache", "RestoreKernelCache_kernelcache"), CurrentKernelCacheIV, CurrentKernelCacheKey, True)
+            If DowngradeType = "OTA" Then
+                xpwntool(tempdir + "\IPSW" + KernelCacheName, tempdir + "\IPSW" + KernelCacheName.Replace("kernelcache", "RestoreKernelCache_kernelcache"), CurrentKernelCacheIV, CurrentKernelCacheKey, True)
+            Else
+                Rename(tempdir + "\IPSW" + KernelCacheName, tempdir + "\IPSW" + KernelCacheName + ".toflash")
+                xpwntool(tempdir + "\IPSW" + KernelCacheName + ".toflash", tempdir + "\IPSW" + KernelCacheName, CurrentKernelCacheIV, CurrentKernelCacheKey, True)
+            End If
         ElseIf ExploitType = "limera1n" Then
             FileCopy(tempdir + "\IPSW" + KernelCacheName, tempdir + "\IPSW" + KernelCacheName.Replace("kernelcache", "RestoreKernelCache_kernelcache"))
         End If
@@ -371,12 +373,14 @@ FileCheck:
             ProcessRootFS(tempdir + "\IPSW" + rootfsName)
         End If
 
-        If OTADowngrade = False And TetheredDowngrade = False Then
+        If DowngradeType <> "OTA" And DowngradeType <> "NOSIGN" Then
             DowngradeProgressBar.Value = 60
             ProgressLabel.Text = "60% - Signing IPSW..."
-            SignIMG3Set(iOSAsInteger(), False)
+            SignIMG3Set(iOSAsInteger(iOS_Version), False)
 
-            If iOSAsInteger() > 4 Then
+            If iOSAsInteger(iOS_Version) > 4 Then
+                'easiest way to comment multiple lines in vb.net...
+                'If False = True Then
                 DowngradeProgressBar.Value = 70
                 ProgressLabel.Text = "60% - Adding 'apticket.img3'..."
                 If IsiFaithMode = False Then
@@ -391,12 +395,26 @@ FileCheck:
                 fs.Write(manifest, 0, manifest.Length)
                 fs.Close()
 
+                'End If
             End If
         End If
 
         DowngradeProgressBar.Value = 80
         ProgressLabel.Text = "80% - Generating Beehind manifest file..."
         WriteBeehindXML(tempdir + "\IPSW\Beehind.xml")
+
+
+        If ExploitType = "kloader" And DowngradeType <> "OTA" Then
+            ' se idevicerestore non supporta gli xml, convertire l'xml nel bplist00 shsh
+            If IsiFaithMode = True Then
+                ' convertire il file di iFaith in un XML
+            End If
+            DowngradeProgressBar.Value = 85
+            ProgressLabel.Text = "85% - Preparing SHSH file for idevicerestore..."
+            CreateDirectory(tempdir + "\IPSW", "\shsh", False)
+            FileCopy(SHSHPath, tempdir + "\IPSW\shsh\" + CurrentDecimalECID + "-" + DeviceModel + "-" + iOS_Version + ".shsh")
+        End If
+
 
         DowngradeProgressBar.Value = 90
         ProgressLabel.Text = "90% - Re-Packing Custom Firmware..."
@@ -408,7 +426,7 @@ FileCheck:
         ProgressLabel.Text = "95% - (Re)cleaning up..."
         Delete(False, tempdir + "\apticket.der")
         Delete(False, tempdir + "\tss-request.plist")
-        If OTADowngrade = True Then
+        If DowngradeType = "OTA" Then
             File.Copy(XMLPath, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\" + CurrentDecimalECID + "_" + DeviceModel + "_" + iOS_Version + "_" + iOS_Build + "_kloader-bundle\" + CurrentDecimalECID + "-" + DeviceModel + "-" + iOS_Version + "-" + iOS_Build + "_OTABlobs.plist")
         End If
         Delete(False, XMLPath)
@@ -418,7 +436,7 @@ FileCheck:
         My.Computer.Audio.Play(My.Resources.sound_completed, _
             AudioPlayMode.Background)
         MessageBox.Show("Done! A new directory has been created on your desktop containing the custom IPSW and a patched iBSS (required for entering in Pwned DFU Mode)")
-        If OTADowngrade = True = True Then
+        If DowngradeType = "OTA" Then
             MessageBox.Show("Since you've chosen an OTA downgrade, this firmware is not signed; it will be signed during the restore. For safety reasons, you'll also find a .plist file inside the new folder on your Desktop. Keep it in a secure place, because that is the only way to go back to iOS 6.1.3 if Apple will close this signing window")
         End If
         KloaderInjector.iBSSPathTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\" + CurrentDecimalECID + "_" + DeviceModel + "_" + iOS_Version + "_" + iOS_Build + "_kloader-bundle\" + DeviceModel + "_" + iOS_Version + "_" + iOS_Build + "_iBSS-pwned.img3"
@@ -481,7 +499,7 @@ FileCheck:
 
     Private Sub HacktivateCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles HacktivateCheckBox.CheckedChanged
         If HacktivateCheckBox.Checked = True Then
-            If OTADowngrade = True Then
+            If DowngradeType = "OTA" Then
                 MessageBox.Show("Refusing to Hacktivate the device since it makes no sense if you're doing an OTA Downgrade...", "No Hacktivation",
                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 HacktivateCheckBox.Checked = False
@@ -498,7 +516,7 @@ FileCheck:
     End Sub
 
     Private Sub NoNANDFlashCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles NoNANDFlashCheckBox.CheckedChanged
-        If NoNANDFlashCheckBox.Checked = True And TetheredDowngrade = False Then
+        If NoNANDFlashCheckBox.Checked = True And DowngradeType <> "NOSIGN" Then
             Dim UserChoice As Integer = MessageBox.Show("Avoiding NOR flashing will render your device unbootable! I added this option only for expert users who know what these things are... Do you really want to enable it?", "Are you sure about that?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
             If UserChoice = DialogResult.No Then
                 NoNANDFlashCheckBox.Checked = False
@@ -519,8 +537,10 @@ FileCheck:
         End If
     End Sub
 
-    Private Sub MD5CheckerBW_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles MD5CheckerBW.DoWork
-        IPSWParser(Check_File_MD5(IPSWPath))
-    End Sub
+    Public Shared itunespath As String = String.Empty
+    Private Sub Button1_Click_3(sender As Object, e As EventArgs)
+        iTunesRestore.Show()
 
+
+    End Sub
 End Class

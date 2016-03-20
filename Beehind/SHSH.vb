@@ -8,7 +8,6 @@ Public Class SHSH
     Public Shared Sub SplitNewSHSH(Infile As String, workingdirectory As String, ExtractFolder As String)
         Dim DestinationFolder As String = workingdirectory + ExtractFolder
         CreateDirectory(workingdirectory, ExtractFolder, True)
-        Dim shshHeader As String = "<?xml version=" + """" + "1.0" + """" + " encoding=" + """" + "utf-8" + """" + "?>" + Environment.NewLine + "<!DOCTYPE plist PUBLIC " + """" + "-//Apple Computer//DTD PLIST 1.0//EN" + """" + " " + """" + "http://www.apple.com/DTDs/PropertyList-1.0.dtd" + """" + ">" + Environment.NewLine + "<plist version=" + """" + "1.0" + """" + ">"
         Dim BuildsPattern As Regex = New Regex("<key>\d{2}\w\d{3}")
         Dim BuildsDocument() As String = IO.File.ReadAllLines(Infile)
         For Each BuildsLine In BuildsDocument

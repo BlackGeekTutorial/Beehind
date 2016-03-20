@@ -8,6 +8,7 @@ Imports Beehind.XML
 Imports Beehind.ECIDManagement
 Imports System.Globalization
 Imports Microsoft.VisualBasic
+Imports System.Threading
 
 Public Class SignIMG3
 
@@ -188,14 +189,14 @@ Public Class SignIMG3
             StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\dfu" + iBSSName, iBSS)
         End If
 
-        If iOSAsInteger() < 8 Then
+        If iOSAsInteger(iOS_Version) < 8 Then
             'ios 7
             If SignPWN = True Then
                 StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\dfu" + iBECName, iBEC)
             End If
         End If
 
-        If iOSAsInteger() < 7 Then
+        If iOSAsInteger(iOS_Version) < 7 Then
             'ios 6 or 5
             StitchBlobAndFixHeader(tempdir + "\IPSW" + KernelCacheName, KernelCache)
 
@@ -204,7 +205,7 @@ Public Class SignIMG3
             End If
         End If
 
-        If iOSAsInteger() < 5 Then
+        If iOSAsInteger(iOS_Version) < 5 Then
             'ios 4 
             StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + AppleLogoName, AppleLogo)
             StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + BatteryCharging0Name, BatteryCharging0)
@@ -217,6 +218,134 @@ Public Class SignIMG3
             StitchBlobAndFixHeader(tempdir + "\IPSW\Firmware\all_flash" + all_flashFolder + iBootName, iBoot)
         End If
     End Sub
+
+    Public Shared Function ExistsInBuildManifest(Infile As String, value As String, valuetype As String, Optional ByVal subvalue As String = "", Optional ByVal subvaluetype As String = "")
+        If subvalue = "" Then
+            If File.ReadAllText(Infile).Contains("<" + valuetype + ">" + value + "</" + valuetype + ">") Then
+                Return True
+            Else
+                Return False
+            End If
+        Else
+            Dim BuildManifest() As String = IO.File.ReadAllLines(Infile)
+
+            Dim BuildManifestLines As Integer = BuildManifest.Length
+            Dim position As Integer = 0
+            Dim rightblob As Boolean = False
+            Dim data As String = String.Empty
+
+            Dim open = 0
+            Dim closed = 0
+
+            Dim typeopen = 0
+            Dim typeclosed = 0
+
+            Do While position < BuildManifestLines
+
+                If BuildManifest(position).Contains("<key>" + value + "</key>") Then
+                    If BuildManifest(position + 1).Contains("<" + valuetype + ">") Then
+                        rightblob = True
+                    End If
+                End If
+
+                If BuildManifest(position).Contains("<dict>") And rightblob = True Then
+                    open = open + 1
+                End If
+
+                If BuildManifest(position).Contains("</dict>") And rightblob = True Then
+                    closed = closed + 1
+                End If
+
+                If open = closed And open <> 0 Then
+                    rightblob = False
+                    Exit Do
+                    Return False
+                End If
+
+                If BuildManifest(position).Contains(subvalue) And rightblob = True Then
+                    Return True
+                    Exit Do
+                End If
+
+                position = position + 1
+            Loop
+        End If
+    End Function
+
+    Public Shared Function GetFromBuildManifest(Infile As String, value As String, valuetype As String, subvalue As String, subvaluetype As String, multiline As Boolean, Optional ByVal subvaluekey As String = "key")
+        Dim BuildManifest() As String = IO.File.ReadAllLines(Infile)
+
+        Dim BuildManifestLines As Integer = BuildManifest.Length
+        Dim position As Integer = 0
+        Dim rightblob As Boolean = False
+        Dim data As String = String.Empty
+
+        Dim open = 0
+        Dim closed = 0
+
+        Dim typeopen = 0
+        Dim typeclosed = 0
+
+        Do While position <> BuildManifestLines
+            If BuildManifest(position).Contains("</plist") Then
+                Exit Do
+                Exit Function
+            End If
+
+            If BuildManifest(position).Contains(value) And rightblob = False Then
+                If BuildManifest(position + 1).Contains(valuetype) Then
+                    rightblob = True
+                End If
+            End If
+
+            If BuildManifest(position).Contains("<dict>") And rightblob = True Then
+                open = open + 1
+            End If
+
+            If BuildManifest(position).Contains("</dict>") And rightblob = True Then
+                closed = closed + 1
+            End If
+
+            If open = closed And open <> 0 Then
+                rightblob = False
+            End If
+
+            If BuildManifest(position).Contains("<" + subvaluekey + ">" + subvalue + "</" + subvaluekey + ">") And rightblob = True Then
+                Do While True
+
+                    If BuildManifest(position).Contains("<" + subvaluetype + ">") Then
+                        typeopen = typeopen + 1
+                    End If
+
+                    If typeopen <> typeclosed And typeopen <> 0 Then
+                        If multiline = False Then
+                            data = data + BuildManifest(position)
+                        Else
+                            data = data + BuildManifest(position) + Environment.NewLine
+                        End If
+                    End If
+
+                    If BuildManifest(position).Contains("</" + subvaluetype + ">") Then
+                        typeclosed = typeclosed + 1
+                    End If
+
+                    If typeopen = typeclosed And typeopen <> 0 Then
+                        Exit Do
+                    End If
+
+                    position = position + 1
+                Loop
+            End If
+
+            position = position + 1
+        Loop
+
+        If multiline = False Then
+            Return ((data.Replace("<" + subvaluetype + ">", "").Replace("</" + subvaluetype + ">", "")).Replace(vbTab, "")).Trim()
+        Else
+            Return data
+        End If
+    End Function
 
     Public Shared Function ObtainRestoreLogoDigest(InfileXML As String)
         Dim XMLReader As XmlTextReader = New XmlTextReader(InfileXML)
@@ -404,6 +533,10 @@ Public Class SignIMG3
         bplist2xml("""" + InfilePlist + """" + " " + """" + OutfileXml + """")
     End Sub
 
+    Public Shared Sub XmlToBplist(InfileXml As String, OutfileBplist As String)
+        xml2bplist("""" + InfileXml + """" + " " + """" + OutfileBplist + """")
+    End Sub
+
 
     Public Shared Sub WriteBeehindXML(Infile As String)
         File.Create(Infile).Dispose()
@@ -418,64 +551,94 @@ Public Class SignIMG3
             XMLWriter.WriteLine("	<key>RestoreManifest</key>")
             XMLWriter.WriteLine("	<dict>")
             If AppleLogoName <> "" Then
-                XMLWriter.WriteLine("		<key>AppleLogo</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + AppleLogoName + "</string>")
+                If DowngradeType = "OTA" Then
+                    XMLWriter.WriteLine("		<key>AppleLogo</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + AppleLogoName + "</string>")
+                Else
+                    XMLWriter.WriteLine("		<key>AppleLogo</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + AppleLogoName + ".toflash" + "</string>")
+                End If
             End If
-            If BatteryChargingName <> "" Then
-                XMLWriter.WriteLine("		<key>BatteryCharging</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryChargingName + "</string>")
-            End If
-            If BatteryCharging0Name <> "" Then
-                XMLWriter.WriteLine("		<key>BatteryCharging0</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryCharging0Name + "</string>")
-            End If
-            If BatteryCharging1Name <> "" Then
-                XMLWriter.WriteLine("		<key>BatteryCharging1</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryCharging1Name + "</string>")
-            End If
-            If BatteryFullName <> "" Then
-                XMLWriter.WriteLine("		<key>BatteryFull</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryFullName + "</string>")
-            End If
-            If BatteryLow0Name <> "" Then
-                XMLWriter.WriteLine("		<key>BatteryLow0</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryLow0Name + "</string>")
-            End If
-            If BatteryLow1Name <> "" Then
-                XMLWriter.WriteLine("		<key>BatteryLow1</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryLow1Name + "</string>")
-            End If
-            If BatteryPluginName <> "" Then
-                XMLWriter.WriteLine("		<key>BatteryPlugin</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryPluginName + "</string>")
-            End If
+                If BatteryChargingName <> "" Then
+                    XMLWriter.WriteLine("		<key>BatteryCharging</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryChargingName + "</string>")
+                End If
+                If BatteryCharging0Name <> "" Then
+                    XMLWriter.WriteLine("		<key>BatteryCharging0</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryCharging0Name + "</string>")
+                End If
+                If BatteryCharging1Name <> "" Then
+                    XMLWriter.WriteLine("		<key>BatteryCharging1</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryCharging1Name + "</string>")
+                End If
+                If BatteryFullName <> "" Then
+                    XMLWriter.WriteLine("		<key>BatteryFull</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryFullName + "</string>")
+                End If
+                If BatteryLow0Name <> "" Then
+                    XMLWriter.WriteLine("		<key>BatteryLow0</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryLow0Name + "</string>")
+                End If
+                If BatteryLow1Name <> "" Then
+                    XMLWriter.WriteLine("		<key>BatteryLow1</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryLow1Name + "</string>")
+                End If
+                If BatteryPluginName <> "" Then
+                    XMLWriter.WriteLine("		<key>BatteryPlugin</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + BatteryPluginName + "</string>")
+                End If
             If DeviceTreeName <> "" Then
-                XMLWriter.WriteLine("		<key>DeviceTree</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + DeviceTreeName + "</string>")
+                If DowngradeType = "OTA" Then
+                    XMLWriter.WriteLine("		<key>DeviceTree</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + DeviceTreeName + "</string>")
+                Else
+                    XMLWriter.WriteLine("		<key>DeviceTree</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + DeviceTreeName + ".toflash" + "</string>")
+                End If
             End If
             If KernelCacheName <> "" Then
-                XMLWriter.WriteLine("		<key>KernelCache</key>")
-                XMLWriter.WriteLine("		<string>" + KernelCacheName.Replace("\", "") + "</string>")
+                If DowngradeType = "OTA" Then
+                    XMLWriter.WriteLine("		<key>KernelCache</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + KernelCacheName + "</string>")
+                Else
+                    XMLWriter.WriteLine("		<key>KernelCache</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + KernelCacheName + ".toflash" + "</string>")
+                End If
             End If
-            If LLBName <> "" Then
-                XMLWriter.WriteLine("		<key>LLB</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + LLBName + "</string>")
-            End If
-            If RecoveryModeName <> "" Then
-                XMLWriter.WriteLine("		<key>RecoveryMode</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + RecoveryModeName + "</string>")
-            End If
+                If LLBName <> "" Then
+                    XMLWriter.WriteLine("		<key>LLB</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + LLBName + "</string>")
+                End If
+                If RecoveryModeName <> "" Then
+                    XMLWriter.WriteLine("		<key>RecoveryMode</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + RecoveryModeName + "</string>")
+                End If
             If DeviceTreeName <> "" Then
-                XMLWriter.WriteLine("		<key>RestoreDeviceTree</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + DeviceTreeName.Replace("DeviceTree", "Restor    eDeviceTree_DeviceTree") + "</string>")
+                If DowngradeType = "OTA" Then
+                    XMLWriter.WriteLine("		<key>RestoreDeviceTree</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + DeviceTreeName.Replace("DeviceTree", "RestoreDeviceTree_DeviceTree") + "</string>")
+                Else
+                    XMLWriter.WriteLine("		<key>RestoreDeviceTree</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + DeviceTreeName + "</string>")
+                End If
             End If
             If KernelCacheName <> "" Then
-                XMLWriter.WriteLine("		<key>RestoreKernelCache</key>")
-                XMLWriter.WriteLine("		<string>" + KernelCacheName.Replace("\kernelcache", "RestoreKernelCache_kernelcache") + "</string>")
+                If DowngradeType = "OTA" Then
+                    XMLWriter.WriteLine("		<key>RestoreKernelCache</key>")
+                    XMLWriter.WriteLine("		<string>" + KernelCacheName.Replace("\kernelcache", "RestoreKernelCache_kernelcache") + "</string>")
+                Else
+                    XMLWriter.WriteLine("		<key>RestoreKernelCache</key>")
+                    XMLWriter.WriteLine("		<string>" + KernelCacheName + "</string>")
+                End If
             End If
             If AppleLogoName <> "" Then
-                XMLWriter.WriteLine("		<key>RestoreLogo</key>")
-                XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + AppleLogoName.Replace("applelogo", "RestoreLogo_applelogo") + "</string>")
+                If DowngradeType = "OTA" Then
+                    XMLWriter.WriteLine("		<key>RestoreLogo</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + AppleLogoName.Replace("applelogo", "RestoreLogo_applelogo") + "</string>")
+                Else
+                    XMLWriter.WriteLine("		<key>RestoreLogo</key>")
+                    XMLWriter.WriteLine("		<string>Firmware\all_flash" + all_flashFolder + AppleLogoName + "</string>")
+                End If
             End If
             If RestoreRamdiskName <> "" Then
                 XMLWriter.WriteLine("		<key>RestoreRamDisk</key>")
@@ -502,16 +665,168 @@ Public Class SignIMG3
             XMLWriter.WriteLine("	<string>" + iOS_Build + "</string>")
             XMLWriter.WriteLine("	<key>iOSVersion</key>")
             XMLWriter.WriteLine("	<string>" + iOS_Version + "</string>")
-            XMLWriter.WriteLine("	<key>Pre-Signed</key>")
-            If OTADowngrade = True Then
-                XMLWriter.WriteLine("	<string>false</string>")
-            Else
+            XMLWriter.WriteLine("	<key>IPSW Type</key>")
+            XMLWriter.WriteLine("	<string>" + DowngradeType + "</string>")
+            XMLWriter.WriteLine("	<key>restored_external patch</key>")
+            If RestoredExternalPatch = True Then
                 XMLWriter.WriteLine("	<string>true</string>")
+            Else
+                XMLWriter.WriteLine("	<string>false</string>")
+            End If
+            XMLWriter.WriteLine("	<key>OTA Downgrade</key>")
+            If DowngradeType = "OTA" Then
+                XMLWriter.WriteLine("	<string>true</string>")
+            Else
+                XMLWriter.WriteLine("	<string>false</string>")
             End If
             XMLWriter.WriteLine("		<key>DecimalECID</key>")
             XMLWriter.WriteLine("		<string>" + CurrentDecimalECID + "</string>")
             XMLWriter.WriteLine("</dict>")
             XMLWriter.Write("</plist>")
+            XMLWriter.Close()
+        End Using
+    End Sub
+
+    Public Shared Sub WriteTSSRequest(BuildManifest As String, Outfile As String, ecid As String, apticket As Boolean, bbticket As Boolean, img4 As Boolean, Optional ByVal apnonce As String = "", Optional ByVal bbnonce As String = "", Optional ByVal bbsnum As String = "", Optional ByVal bbgoldcertid As String = "", Optional ByVal sepnonce As String = "")
+        Dim Cool As String() = {"AppleLogo", "BatteryCharging", "BatteryCharging0", "BatteryCharging1", "BatteryFull", "BatteryLow0", "BatteryLow1", "BatteryPlugin", "DeviceTree", "KernelCache", "LLB", "RecoveryMode", "RestoreDeviceTree", "RestoreKernelCache", "RestoreLogo", "RestoreRamDisk", "iBEC", "iBSS", "iBoot", "RestoreSEP", "SEP", "ftap", "ftsp", "rfta", "rfts"}
+
+        File.Create(Outfile).Dispose()
+        Using XMLWriter As StreamWriter = New StreamWriter(Outfile, True)
+            'System.Text.Encoding.UTF8
+            XMLWriter.Write(shshHeader)
+            XMLWriter.WriteLine("<dict>")
+            If apticket = True Then
+                If Not img4 Then
+                    XMLWriter.WriteLine("	<key>@APTicket</key>")
+                    XMLWriter.WriteLine("	<true/>")
+                Else
+                    XMLWriter.WriteLine("	<key>@ApImg4Ticket</key>")
+                    XMLWriter.WriteLine("	<true/>")
+                End If
+            End If
+            If bbticket = True Then
+                XMLWriter.WriteLine("	<key>@BBTicket</key>")
+                XMLWriter.WriteLine("	<true/>")
+            End If
+            XMLWriter.WriteLine("	<key>@HostPlatformInfo</key>")
+            XMLWriter.WriteLine("	<string>windows</string>")
+            XMLWriter.WriteLine("	<key>@VersionInfo</key>")
+            XMLWriter.WriteLine("	<string>libauthinstall-391.0.0.1.3</string>")
+            XMLWriter.WriteLine("	<key>@Locality</key>")
+            XMLWriter.WriteLine("	<string>" + Thread.CurrentThread.CurrentCulture.Name + "</string>")
+            XMLWriter.WriteLine("	<key>ApBoardID</key>")
+            XMLWriter.WriteLine("	<integer>" + (HexToDec(GetFromBuildManifest(BuildManifest, "array", "dict", "ApBoardID", "string", False))).ToString + "</integer>")
+            XMLWriter.WriteLine("	<key>ApChipID</key>")
+            XMLWriter.WriteLine("	<integer>" + (HexToDec(GetFromBuildManifest(BuildManifest, "array", "dict", "ApChipID", "string", False))).ToString + "</integer>")
+            If ecid <> String.Empty Then
+                XMLWriter.WriteLine("	<key>ApECID</key>")
+                XMLWriter.WriteLine("	<integer>" + ecid + "</integer>")
+            End If
+            If apticket = True Then
+                If apnonce.Length = 28 Then
+                    XMLWriter.WriteLine("	<key>ApNonce</key>")
+                    XMLWriter.WriteLine("	<data>" + apnonce + "</data>")
+                Else
+                    XMLWriter.WriteLine("	<key>ApNonce</key>")
+                    XMLWriter.WriteLine("	<data>FFrp/uZvF8gUV8Xj9RaXRyOZiO0=</data>")
+                End If
+            End If
+
+            If img4 = True Then
+                If sepnonce.Length = 28 Then
+                    XMLWriter.WriteLine("	<key>SepNonce</key>")
+                    XMLWriter.WriteLine("	<data>" + sepnonce + "</data>")
+                    ' trovato nel BM.plist di iPhone 6 iOS 9.2.1
+                    XMLWriter.WriteLine("	<key>ApSecurityMode</key>")
+                    XMLWriter.WriteLine("	<true/>")
+                Else
+                    XMLWriter.WriteLine("	<key>SepNonce</key>")
+                    XMLWriter.WriteLine("	<data>nE+WLdr06Ey/9TZu93+BedtRcmQ=</data>")
+                End If
+            End If
+            XMLWriter.WriteLine("	<key>ApProductionMode</key>")
+            XMLWriter.WriteLine("	<true/>")
+            XMLWriter.WriteLine("	<key>ApSecurityDomain</key>")
+            XMLWriter.WriteLine("	<integer>" + (HexToDec(GetFromBuildManifest(BuildManifest, "array", "dict", "ApSecurityDomain", "string", False))).ToString + "</integer>")
+
+
+
+
+            For Each element In Cool
+                If ExistsInBuildManifest(BuildManifest, element, "key") Then
+                    XMLWriter.WriteLine("	<key>" + element + "</key>")
+                    XMLWriter.WriteLine("	<dict>")
+                    If element = "LLB" Or element = "iBSS" Or element = "iBEC" Then
+                        XMLWriter.WriteLine("			<key>BuildString</key>")
+                        XMLWriter.WriteLine("			<string>" + GetFromBuildManifest(BuildManifest, "<key>" + element + "</key>", "dict", "BuildString", "string", False) + "</string>")
+                    End If
+                    If element <> "ftap" And element <> "ftsp" And element <> "rfta" And element <> "rfts" Then
+                        If GetFromBuildManifest(BuildManifest, "<key>" + element + "</key>", "dict", "Digest", "data", False) <> String.Empty Then
+                            XMLWriter.WriteLine("		<key>Digest</key>")
+                            XMLWriter.WriteLine("		<data>" + GetFromBuildManifest(BuildManifest, "<key>" + element + "</key>", "dict", "Digest", "data", False) + "</data>")
+                        End If
+                    Else
+                        ' quei 4 stronzi vogliono il Digest anche se è vuoto :/
+                        XMLWriter.WriteLine("		<key>Digest</key>")
+                        XMLWriter.WriteLine("		<data>" + GetFromBuildManifest(BuildManifest, "<key>" + element + "</key>", "dict", "Digest", "data", False) + "</data>")
+                    End If
+                    If img4 = True Then
+                        XMLWriter.WriteLine("		<key>EPRO</key>")
+                        XMLWriter.WriteLine("		<true/>")
+                        XMLWriter.WriteLine("		<key>ESEC</key>")
+                        XMLWriter.WriteLine("		<true/>")
+                    End If
+                    If GetFromBuildManifest(BuildManifest, "<key>" + element + "</key>", "dict", "PartialDigest", "data", False) <> String.Empty Then
+                        XMLWriter.WriteLine("		<key>PartialDigest</key>")
+                        XMLWriter.WriteLine("		<data>" + GetFromBuildManifest(BuildManifest, "<key>" + element + "</key>", "dict", "PartialDigest", "data", False) + "</data>")
+                    End If
+                    If ExistsInBuildManifest(BuildManifest, element, "dict", "Trusted", "") = True Then
+                        XMLWriter.WriteLine("		<key>Trusted</key>")
+                        XMLWriter.WriteLine("		<true/>")
+                    End If
+                    XMLWriter.WriteLine("	</dict>")
+                End If
+            Next
+
+            If bbticket = True Then
+                XMLWriter.WriteLine("	<key>BasebandFirmware</key>")
+                XMLWriter.Write(GetFromBuildManifest(BuildManifest, "Manifest", "dict", "BasebandFirmware", "dict", True))
+
+                XMLWriter.WriteLine("	<key>BbChipID</key>")
+                XMLWriter.WriteLine("	<integer>" + (HexToDec(GetFromBuildManifest(BuildManifest, "array", "dict", "BbChipID", "string", False))).ToString + "</integer>")
+                XMLWriter.WriteLine("	<key>BbGoldCertId</key>")
+                XMLWriter.WriteLine("	<integer>" + bbgoldcertid + "</integer>")
+                If bbnonce.Length = 28 Then
+                    XMLWriter.WriteLine("	<key>BbNonce</key>")
+                    XMLWriter.WriteLine("	<data>" + bbnonce + "</data>")
+                Else
+                    XMLWriter.WriteLine("	<key>BbNonce</key>")
+                    XMLWriter.WriteLine("	<data>FFrp/uZvF8gUV8Xj9RaXRyOZiO0=</data>")
+                End If
+                XMLWriter.WriteLine("	<key>BbSNUM</key>")
+                XMLWriter.WriteLine("	<data>" + bbsnum + "</data>")
+
+                If ExistsInBuildManifest(BuildManifest, "BbSkeyId", "key") Then
+                    XMLWriter.WriteLine("	<key>BbSkeyId</key>")
+                    XMLWriter.WriteLine("	<data>" + GetFromBuildManifest(BuildManifest, "array", "dict", "BbSkeyId", "data", False) + "</data>")
+                End If
+
+                If ExistsInBuildManifest(BuildManifest, "BbActivationManifestKeyHash", "key") Then
+                    XMLWriter.WriteLine("	<key>BbActivationManifestKeyHash</key>")
+                    XMLWriter.WriteLine("	<data>" + GetFromBuildManifest(BuildManifest, "array", "dict", "BbActivationManifestKeyHash", "data", False) + "</data>")
+                End If
+
+                If ExistsInBuildManifest(BuildManifest, "BbProvisioningManifestKeyHash", "key") Then
+                    XMLWriter.WriteLine("	<key>BbProvisioningManifestKeyHash</key>")
+                    XMLWriter.WriteLine("	<data>" + GetFromBuildManifest(BuildManifest, "array", "dict", "BbProvisioningManifestKeyHash", "data", False) + "</data>")
+                End If
+
+            End If
+            XMLWriter.WriteLine("	<key>UniqueBuildID</key>")
+            XMLWriter.WriteLine("	<data>" + GetFromBuildManifest(BuildManifest, "array", "dict", "UniqueBuildID", "data", False) + "</data>")
+            XMLWriter.WriteLine("</dict>")
+            XMLWriter.Write("</plist>")
+
             XMLWriter.Close()
         End Using
     End Sub

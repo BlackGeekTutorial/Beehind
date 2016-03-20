@@ -12,13 +12,22 @@ Imports System.Collections
 Imports System.Diagnostics
 Imports System.ComponentModel
 Imports System.Text.RegularExpressions
+Imports System.Security.Principal
+Imports Microsoft.Win32
 
 Public Class Common_Functions
 
+    Public Shared Function IsRoot()
+        Dim identity = WindowsIdentity.GetCurrent()
+        Dim principal = New WindowsPrincipal(identity)
+        Dim isElevated As Boolean = principal.IsInRole(WindowsBuiltInRole.Administrator)
+
+        Return isElevated
+    End Function
+
     Public Shared Sub Reset()
         MainView.IPSWTextBox.Text = ""
-        OTADowngrade = False
-        TetheredDowngrade = False
+        DowngradeType = "SIGNED"
         MainView.IPSWGroupBox.Text = "Browse for the IPSW"
         MainView.SHSHGroupBox.Text = "Browse for SHSH"
         MainView.SHSHTextBox.Text = ""
@@ -56,7 +65,7 @@ Public Class Common_Functions
         iOS_Version = ""
         iOS_Build = ""
         DeviceModel = ""
-        board_id = ""
+        DeviceClass = ""
         iPhoneProcessor = ""
         CurrentRootFSKey = ""
         CurrentRestoreRamdiskIV = ""
@@ -123,6 +132,21 @@ Public Class Common_Functions
             MainView.CustomBundleCheckBox.Enabled = False
         End If
     End Sub
+    Public Shared Function GetSettingItem(Infile As String, Identifier As String) As String
+        Dim SettingsDocument() As String = IO.File.ReadAllLines(Infile)
+        Dim DocumentLength As Integer = SettingsDocument.Length
+        Dim CurrentLine As Integer = 0
+        Dim result As String = "GOTANYITEM!"
+        Do Until CurrentLine = DocumentLength Or result <> "GOTANYITEM!"
+            If SettingsDocument(CurrentLine).Trim.StartsWith(Identifier) Then
+                result = (SettingsDocument(CurrentLine).Trim).Replace(Identifier + ": ", "")
+                CurrentLine = CurrentLine + 1
+            Else
+                CurrentLine = CurrentLine + 1
+            End If
+        Loop
+        Return result.Trim
+    End Function
 
     Public Shared Sub Delay(ByVal dblSecs As Double)
         'iH8Sn0w Delay
@@ -134,6 +158,55 @@ Public Class Common_Functions
             Application.DoEvents()
         Loop
     End Sub
+
+    Public Shared Function UninstallProgram(name As String, wait As Boolean) As Integer
+        Dim uninstallstring As String = String.Empty
+        Dim ParentKey As RegistryKey
+        If Environment.Is64BitOperatingSystem = True Then
+            ParentKey = RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, RegistryView.Registry64)
+            ParentKey = ParentKey.OpenSubKey("SOFTWARE\MICROSOFT\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products")
+        Else
+            ParentKey = RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, RegistryView.Registry32)
+            ParentKey = ParentKey.OpenSubKey("SOFTWARE\MICROSOFT\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products")
+        End If
+
+        Dim ChildKey As RegistryKey
+
+        For Each child As String In ParentKey.GetSubKeyNames()
+
+            ChildKey = ParentKey.OpenSubKey(child).OpenSubKey("InstallProperties")
+
+            If Not ChildKey Is Nothing Then
+
+                If ChildKey.GetValue("DisplayName").ToString.Contains(name) And ChildKey.GetValue("UninstallString") IsNot Nothing Then
+                    uninstallstring = ChildKey.GetValue("UninstallString")
+                    Exit For
+                End If
+            End If
+        Next
+        If Not uninstallstring.Contains("No Uninstall String") Then
+            If wait = False Then
+                Return Shell(uninstallstring, AppWinStyle.NormalFocus)
+            Else
+                Dim pid As Integer
+                pid = Shell(uninstallstring, AppWinStyle.NormalFocus)
+                If Not pid = 0 Then
+                    Do Until ProcessPIDIsRunning(pid) = True
+                        Delay(1)
+                    Loop
+                    Do While ProcessPIDIsRunning(pid) = True
+                        Delay(1)
+                    Loop
+                    Return pid
+                Else
+                    MessageBox.Show("Beehind wasn't able to uninstall " + name + ".", "Uninstaller failed", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    Exit Function
+                End If
+            End If
+        Else
+            Return 0
+        End If
+    End Function
 
     Public Shared Function DeterminateCurrentDate()
         Dim regDate As Date = Date.Now()
@@ -161,33 +234,22 @@ Public Class Common_Functions
         System.IO.File.WriteAllLines(FileAddress, TheFileLines.ToArray)
     End Sub
 
-
-    Public Shared Function ReadAllBytes(reader As BinaryReader) As Byte()
-        Const bufferSize As Integer = 4096
-        Using ms As New MemoryStream()
-            Dim buffer(bufferSize) As Byte
-            Dim count As Integer
-            Do
-                count = reader.Read(buffer, 0, buffer.Length)
-                If count > 0 Then ms.Write(buffer, 0, count)
-            Loop While count <> 0
-
-            Return ms.ToArray()
-        End Using
-    End Function
-
     Public Shared Sub CreateDirectory(path As String, newdir As String, replace As Boolean)
         If My.Computer.FileSystem.DirectoryExists(path + newdir) Then
             If replace = True Then
                 Delete(True, path + newdir)
                 My.Computer.FileSystem.CreateDirectory(path + newdir)
             End If
+        Else
+            My.Computer.FileSystem.CreateDirectory(path + newdir)
         End If
-        My.Computer.FileSystem.CreateDirectory(path + newdir)
     End Sub
 
-    Public Shared Sub Unzip(Infile As String, Outdir As String)
-        InfoZipUnzip("""" + Infile + """" + " -d" + """" + Outdir + """")
+    Public Shared Sub Unzip(Infile As String, Outdir As String, Optional ByVal JustAFile As String = "")
+        If JustAFile <> "" Then
+            JustAFile = " " + """" + JustAFile + """"
+        End If
+        InfoZipUnzip("-o " + """" + Infile + """" + JustAFile + " -d" + """" + Outdir + """")
     End Sub
 
     Public Shared Sub Zip(ZipFile As String, FileName As String, FilePath As String)
@@ -198,6 +260,14 @@ Public Class Common_Functions
         Dim hex_val As String
         hex_val = Hex(Number)
         Return hex_val
+    End Function
+
+    Public Shared Function HexToDec(Hexnumber As String) As Integer
+        If Hexnumber.Contains("0x") Then
+            Hexnumber = Hexnumber.Replace("0x", "")
+        End If
+        Dim number As Integer = Integer.Parse(Hexnumber, System.Globalization.NumberStyles.HexNumber)
+        Return number
     End Function
 
     Public Shared Function HexToLong(ByVal sHex As String) As Long
@@ -357,80 +427,52 @@ Public Class Common_Functions
         Return -1
     End Function
 
-    Public Shared Sub SendTSSRequest(TSSRequestPlist As String, Outfile As String)
-        Dim TSSRequest As WebRequest = WebRequest.Create("http://gs.apple.com:80/TSS/controller?action=2")
-        TSSRequest.Method = "POST"
-        TSSRequest.ContentType = "text/xml; charset=" + """" + "utf-8" + """"
-        CType(TSSRequest, HttpWebRequest).UserAgent = "User-Agent	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36"
-        Dim TSSRequestFile As Byte() = File.ReadAllBytes(TSSRequestPlist)
-        Dim dataStream As Stream = TSSRequest.GetRequestStream()
-        dataStream.Write(TSSRequestFile, 0, TSSRequestFile.Length)
-        dataStream.Close()
-        Dim response As WebResponse = TSSRequest.GetResponse()
-        Dim data As Stream = response.GetResponseStream
-        Dim reader As New StreamReader(data)
-        Dim AppleResponse As String = reader.ReadToEnd()
-        reader.Close()
-        dataStream.Close()
-        response.Close()
+    Public Shared Sub SendTSSRequest(TSSRequestPlist As String, Outfile As String, Optional ByVal AlterHost As Boolean = False)
 
-        If AppleResponse.Contains("This device isn't eligible for the requested build.") Then
-            MessageBox.Show("This device isn't eligible for the requested build.", "Apple TSS Server Returned an ERROR",
+        Dim tssquery_p As New Process()
+        Try
+            tssquery_p.StartInfo.UseShellExecute = False
+            tssquery_p.StartInfo.FileName = tempdir + "\TSSQuery.exe"
+            tssquery_p.StartInfo.Arguments = """" + TSSRequestPlist + """" + " " + """" + Outfile + """"
+            tssquery_p.StartInfo.CreateNoWindow = True
+            tssquery_p.StartInfo.RedirectStandardOutput = True
+            tssquery_p.StartInfo.RedirectStandardError = True
+            tssquery_p.Start()
+        Catch ex As Exception
+        End Try
+        Do Until tssquery_p.HasExited
+            Delay(1)
+        Loop
+
+        Dim stdout As String = String.Empty
+        Dim stderr As String = String.Empty
+        Dim infos As String = String.Empty
+
+        Using oStreamReader As System.IO.StreamReader = tssquery_p.StandardOutput
+            stdout = oStreamReader.ReadToEnd()
+        End Using
+
+        Using oStreamReader As System.IO.StreamReader = tssquery_p.StandardError
+            stderr = oStreamReader.ReadToEnd()
+        End Using
+
+        infos = stdout + stderr
+
+        If Not infos.Contains("SUCCESS") Then
+            MessageBox.Show(infos, "Apple TSS Server Returned an ERROR",
                             MessageBoxButtons.OK, MessageBoxIcon.Error)
-            OTADowngrade = False
+            DowngradeType = "SIGNED"
             MainView.CancelOTADWN.Visible = False
             MainView.ChooseSHSHButton.Visible = True
             MainView.ChooseSHSHButton.Enabled = True
             MainView.SHSHGroupBox.Text = "Browse for SHSH"
             ECIDForm.Close()
             Exit Sub
-        ElseIf AppleResponse.Contains("An internal error occurred.") Then
-            MessageBox.Show("An internal error occurred.", "Apple TSS Server Returned an ERROR",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error)
-            OTADowngrade = False
-            MainView.CancelOTADWN.Visible = False
-            MainView.ChooseSHSHButton.Visible = True
-            MainView.ChooseSHSHButton.Enabled = True
-            MainView.SHSHGroupBox.Text = "Browse for SHSH"
-            ECIDForm.Close()
-            Exit Sub
-        ElseIf AppleResponse.Contains("No data in the request") Then
-            MessageBox.Show("No data in the request", "Apple TSS Server Returned an ERROR",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error)
-            OTADowngrade = False
-            MainView.CancelOTADWN.Visible = False
-            MainView.ChooseSHSHButton.Visible = True
-            MainView.ChooseSHSHButton.Enabled = True
-            MainView.SHSHGroupBox.Text = "Browse for SHSH"
-            ECIDForm.Close()
-            Exit Sub
-        ElseIf AppleResponse.Contains("Error occured while importing config packet with cpsn:") Then
-            MessageBox.Show("Error occured while importing config packet with cpsn:", "Apple TSS Server Returned an ERROR",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error)
-            OTADowngrade = False
-            MainView.CancelOTADWN.Visible = False
-            MainView.ChooseSHSHButton.Visible = True
-            MainView.ChooseSHSHButton.Enabled = True
-            MainView.SHSHGroupBox.Text = "Browse for SHSH"
-            ECIDForm.Close()
-            Exit Sub
-        ElseIf AppleResponse.Contains("Invalid Option!") Then
-            MessageBox.Show("Invalid Option!", "Apple TSS Server Returned an ERROR",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error)
-            OTADowngrade = False
-            MainView.CancelOTADWN.Visible = False
-            MainView.ChooseSHSHButton.Visible = True
-            MainView.ChooseSHSHButton.Enabled = True
-            MainView.SHSHGroupBox.Text = "Browse for SHSH"
-            ECIDForm.Close()
-            Exit Sub
-        ElseIf AppleResponse.Contains("SUCCESS") Then
-            File.WriteAllText(Outfile, AppleResponse.Replace("STATUS=0&MESSAGE=SUCCESS&REQUEST_STRING=", ""))
         End If
 
     End Sub
 
-    Public Shared Function iOSAsInteger()
+    Public Shared Function iOSAsInteger(ios)
         If iOS_Version.StartsWith("1.") Then
             Return 1
         ElseIf iOS_Version.StartsWith("2.") Then
@@ -538,8 +580,13 @@ Public Class Common_Functions
         Next
     End Sub
 
-    Public Shared Function CheckIfProcessIsRunning(ProcessName As String)
+    Public Shared Function ProcessNameIsRunning(ProcessName As String)
         Return Process.GetProcessesByName(ProcessName).Count
+    End Function
+
+
+    Public Shared Function ProcessPIDIsRunning(id As Integer) As Boolean
+        Return Process.GetProcesses().Any(Function(x) x.Id = id)
     End Function
 
     Public Shared Sub Kill(ProcessesList As String())
@@ -610,7 +657,9 @@ Public Class Common_Functions
         End If
     End Function
 
-    Public Shared Function IsUserlandConnected()
+    Public Shared Function IsUserlandConnected(Optional ByVal comunication As Boolean = True)
+
+A:
         Dim forever As Boolean = True
         Dim USBName As String = String.Empty
         Dim USBSearcher As New ManagementObjectSearcher( _
@@ -620,7 +669,50 @@ Public Class Common_Functions
             USBName += (queryObj("Description"))
         Next
         If USBName.Contains("Apple Mobile Device USB Driver") Then
-            Return True
+            If comunication = True Then
+                Dim a As String = GetDeviceInfos(False)
+                If a.Contains("ActivationState:") Then
+                    Return True
+                Else
+                    If a.Contains("error code -20") Then
+                        'trust this computer
+                        MessageBox.Show("ERROR: This computer host is not trusted by the attatched device. In order to use your iPhone, iPod touch or iPad with Beehind, please tap on 'Trust' button right now. Then click 'OK' to retry" + " " + a, "Untrusted Computer", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        GoTo A
+                    ElseIf a.Contains("error code -14") Then
+                        ' password protected
+                        MessageBox.Show("ERROR: the attatched device is password protected. In order to use your iPhone, iPod touch or iPad with Beehind, please unlock it. Then click 'OK' to retry" + " " + a, "Password-protected", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        GoTo A
+                    Else
+                        'unknown error code
+                        MessageBox.Show("ERROR: Beehind (ideviceinfo) wasn't able to estabilish a connection with the attatched device. Please, unplug and replug it. Then retry with Beehind." + " " + a, "Unknown Error.", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        GoTo A
+                    End If
+                End If
+            Else
+                Return True
+            End If
+        Else
+            Return False
+        End If
+    End Function
+
+    Public Shared Function IsRestoreConnected()
+
+        Dim forever As Boolean = True
+        Dim USBName As String = String.Empty
+        Dim USBSearcher As New ManagementObjectSearcher( _
+                      "root\CIMV2", _
+                      "SELECT * FROM Win32_PnPEntity WHERE Description = 'Apple Mobile Device USB Driver'")
+        For Each queryObj As ManagementObject In USBSearcher.Get()
+            USBName += (queryObj("Description"))
+        Next
+        If USBName.Contains("Apple Mobile Device USB Driver") And Not USBName.Contains("iBoot") And Not USBName.Contains("DFU") Then
+            Dim a As String = GetDeviceInfos(False)
+            If Not a.Contains("ActivationState:") Then
+                Return True
+            Else
+                Return False
+            End If
         Else
             Return False
         End If

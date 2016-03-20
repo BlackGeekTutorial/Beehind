@@ -30,15 +30,19 @@ Partial Class Form1
         Me.DonationsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OriginalXPWNSourceToolStripMenuItem = New System.Windows.Forms.ToolStripSeparator()
         Me.SeeXPWNOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.SeeBeehindOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SelectModeMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.IPSWCreatorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.KloaderModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RestoreModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.IdevicerestoreModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
+        Me.SaveSHSHToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DumpSHSHToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DumpBasebandToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CreditsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
-        Me.SeeBeehindOnGitHubToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BeehindMenuStrip.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -87,9 +91,26 @@ Partial Class Form1
         Me.SeeXPWNOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.SeeXPWNOnGitHubToolStripMenuItem.Text = "See XPWN on GitHub"
         '
+        'SeeIdevicerestoreOnGitHubToolStripMenuItem
+        '
+        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem.Name = "SeeIdevicerestoreOnGitHubToolStripMenuItem"
+        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
+        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem.Text = "See idevicerestore on GitHub"
+        '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(223, 6)
+        '
+        'SeeBeehindOnGitHubToolStripMenuItem
+        '
+        Me.SeeBeehindOnGitHubToolStripMenuItem.Name = "SeeBeehindOnGitHubToolStripMenuItem"
+        Me.SeeBeehindOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
+        Me.SeeBeehindOnGitHubToolStripMenuItem.Text = "See Beehind on GitHub"
+        '
         'SelectModeMenuItem
         '
-        Me.SelectModeMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IPSWCreatorToolStripMenuItem, Me.KloaderModeToolStripMenuItem, Me.RestoreModeToolStripMenuItem, Me.IdevicerestoreModeToolStripMenuItem})
+        Me.SelectModeMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IPSWCreatorToolStripMenuItem, Me.KloaderModeToolStripMenuItem, Me.RestoreModeToolStripMenuItem, Me.IdevicerestoreModeToolStripMenuItem, Me.ToolStripSeparator2, Me.SaveSHSHToolStripMenuItem, Me.DumpSHSHToolStripMenuItem, Me.DumpBasebandToolStripMenuItem})
         Me.SelectModeMenuItem.Name = "SelectModeMenuItem"
         Me.SelectModeMenuItem.Size = New System.Drawing.Size(84, 20)
         Me.SelectModeMenuItem.Text = "Select Mode"
@@ -119,28 +140,34 @@ Partial Class Form1
         Me.IdevicerestoreModeToolStripMenuItem.Size = New System.Drawing.Size(181, 22)
         Me.IdevicerestoreModeToolStripMenuItem.Text = "idevicerestore Mode"
         '
+        'ToolStripSeparator2
+        '
+        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(178, 6)
+        '
+        'SaveSHSHToolStripMenuItem
+        '
+        Me.SaveSHSHToolStripMenuItem.Name = "SaveSHSHToolStripMenuItem"
+        Me.SaveSHSHToolStripMenuItem.Size = New System.Drawing.Size(181, 22)
+        Me.SaveSHSHToolStripMenuItem.Text = "Save SHSH"
+        '
+        'DumpSHSHToolStripMenuItem
+        '
+        Me.DumpSHSHToolStripMenuItem.Name = "DumpSHSHToolStripMenuItem"
+        Me.DumpSHSHToolStripMenuItem.Size = New System.Drawing.Size(181, 22)
+        Me.DumpSHSHToolStripMenuItem.Text = "Dump SHSH"
+        '
+        'DumpBasebandToolStripMenuItem
+        '
+        Me.DumpBasebandToolStripMenuItem.Name = "DumpBasebandToolStripMenuItem"
+        Me.DumpBasebandToolStripMenuItem.Size = New System.Drawing.Size(181, 22)
+        Me.DumpBasebandToolStripMenuItem.Text = "Dump Baseband"
+        '
         'CreditsToolStripMenuItem
         '
         Me.CreditsToolStripMenuItem.Name = "CreditsToolStripMenuItem"
         Me.CreditsToolStripMenuItem.Size = New System.Drawing.Size(56, 20)
         Me.CreditsToolStripMenuItem.Text = "Credits"
-        '
-        'SeeIdevicerestoreOnGitHubToolStripMenuItem
-        '
-        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem.Name = "SeeIdevicerestoreOnGitHubToolStripMenuItem"
-        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
-        Me.SeeIdevicerestoreOnGitHubToolStripMenuItem.Text = "See idevicerestore on GitHub"
-        '
-        'ToolStripSeparator1
-        '
-        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(223, 6)
-        '
-        'SeeBeehindOnGitHubToolStripMenuItem
-        '
-        Me.SeeBeehindOnGitHubToolStripMenuItem.Name = "SeeBeehindOnGitHubToolStripMenuItem"
-        Me.SeeBeehindOnGitHubToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
-        Me.SeeBeehindOnGitHubToolStripMenuItem.Text = "See Beehind on GitHub"
         '
         'Form1
         '
@@ -178,5 +205,9 @@ Partial Class Form1
     Friend WithEvents SeeIdevicerestoreOnGitHubToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents SeeBeehindOnGitHubToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents SaveSHSHToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents DumpSHSHToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents DumpBasebandToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

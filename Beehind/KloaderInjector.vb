@@ -36,8 +36,7 @@ Public Class KloaderInjector
 
         'making sure iBSS is suitable for the connected device
         iBSS = File.ReadAllText(iBSSPathTextBox.Text)
-        Dim DeviceInfos As String = GetDeviceInfos()
-        Dim DumpedHardwareModel As String = (DeviceInfos.Substring(DeviceInfos.IndexOf("HardwareModel") + 15)).Substring(0, (DeviceInfos.Substring(DeviceInfos.IndexOf("HardwareModel") + 15)).IndexOf(Environment.NewLine)).Trim()
+        Dim DumpedHardwareModel As String = GetDeviceInfos(True, "HardwareModel")
         Dim iBSSHardwareModel As String = (Strings.Mid(iBSS, iBSS.IndexOf("iBSS for ") + ("iBSS for ").Length + 1, iBSS.IndexOf(", Copyright ") - iBSS.IndexOf("iBSS for ") - ("iBSS for ").Length)).Trim()
         AddLineToKloaderConsole("[Info] The given iBSS' Hardware model is: " + """" + iBSSHardwareModel + """")
         If DumpedHardwareModel.StartsWith("N") Or DumpedHardwareModel.StartsWith("K") Or DumpedHardwareModel.StartsWith("J") Or DumpedHardwareModel.StartsWith("P") Or DumpedHardwareModel.StartsWith("N") Then
@@ -200,5 +199,9 @@ Public Class KloaderInjector
             SSHSession.ExecuteCommand("chmod 755 /usr/bin/kloader; chmod 777 /var/ibss; kloader /var/ibss")
             SSHSession.Close()
         End Using
+    End Sub
+
+    Private Sub KloaderInjector_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
     End Sub
 End Class

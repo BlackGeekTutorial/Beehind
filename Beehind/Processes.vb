@@ -4,6 +4,7 @@ Imports Beehind.IPSW_URLs
 Imports Beehind.keys
 Imports System.Management
 Imports Beehind.idevicerestoreGUI
+Imports System.IO
 
 Public Class Processes
 
@@ -15,7 +16,7 @@ Public Class Processes
             If IV <> "" And Key <> "" Then
                 xpwnargs = """" + infile + """" + " " + """" + outfile + """" + " -iv " + IV + " -k " + Key
             Else
-                xpwnargs = infile + " " + outfile
+                xpwnargs = """" + infile + """" + " " + """" + outfile + """"
             End If
 
             If decrypt = True Then
@@ -60,7 +61,6 @@ Public Class Processes
         Loop
     End Sub
 
-
     Public Shared Sub itunnel_mux(args As String)
         Dim itunnel_mux_p As New Process()
         Try
@@ -73,12 +73,95 @@ Public Class Processes
         End Try
     End Sub
 
+    Public Shared Sub hostshandler(mode As String, ip As String, hostname As String)
+        Dim sr As New StreamReader(Environment.SystemDirectory & "\drivers\etc\hosts")
+        Dim hosts As String = sr.ReadToEnd()
+        sr.Close()
+
+        If mode = "add" And hosts.Contains(ip + " " + hostname) Then
+            Exit Sub
+        End If
+
+        If mode = "remove" And hosts.Contains(ip + " " + hostname) = False Then
+            Exit Sub
+        End If
+
+        Dim hostshandler_p As New Process()
+        Try
+            hostshandler_p.StartInfo.UseShellExecute = True
+            hostshandler_p.StartInfo.FileName = tempdir + "\hostshandler.exe"
+            hostshandler_p.StartInfo.Arguments = mode + " " + """" + ip + """" + " " + """" + hostname + """"
+            hostshandler_p.StartInfo.CreateNoWindow = True
+            hostshandler_p.StartInfo.Verb = "runas"
+            hostshandler_p.Start()
+        Catch ex As Exception
+        End Try
+        Do Until hostshandler_p.HasExited
+            Delay(1)
+        Loop
+        Delay(1)
+    End Sub
+
+
+    Public Shared Sub partialzip(ZipUrl As String, ZipPath As String, Outfile As String)
+REDO:
+        Dim partialzip_p As New Process()
+        Try
+            partialzip_p.StartInfo.UseShellExecute = False
+            partialzip_p.StartInfo.FileName = tempdir + "\pzip.exe"
+            partialzip_p.StartInfo.Arguments = """" + ZipUrl + """" + " " + """" + ZipPath + """" + " " + """" + Outfile + """"
+            partialzip_p.StartInfo.CreateNoWindow = True
+            partialzip_p.Start()
+        Catch ex As Exception
+        End Try
+
+        Dim timeout = 0
+        Dim looped As Boolean = False
+
+        Do Until IO.File.Exists(Outfile)
+            Delay(1)
+        Loop
+        Dim newfile As New FileInfo(Outfile)
+        Dim size As Long = newfile.Length
+
+        Do Until partialzip_p.HasExited
+
+            If timeout = 5 And size <= 0 Then
+                'dunno why, sometimes my remote zip file downloader loops :(
+                Kill({"pzip"})
+                looped = True
+            End If
+
+            Delay(1)
+            timeout = timeout + 1
+        Loop
+        If looped = True Then
+            GoTo REDO
+        End If
+    End Sub
+
+    Public Shared Sub unrar(RARFile As String, outdir As String)
+
+        Dim unrar_p As New Process()
+        Try
+            unrar_p.StartInfo.UseShellExecute = False
+            unrar_p.StartInfo.FileName = tempdir + "\unrar.exe"
+            unrar_p.StartInfo.Arguments = "x " + """" + RARFile + """" + " " + """" + outdir + """"
+            unrar_p.StartInfo.CreateNoWindow = True
+            unrar_p.Start()
+        Catch ex As Exception
+        End Try
+        Do Until unrar_p.HasExited
+            Delay(1)
+        Loop
+    End Sub
+
     Public Shared Sub idevicerestore(args As String, BeehindMode As Boolean)
         Dim idevicerestore_p As New Process()
         Try
             'idevicerestore_p.StartInfo.UseShellExecute = False
             If BeehindMode = True Then
-                idevicerestore_p.StartInfo.FileName = tempdir + "\libimobiledevice\idevicerestore_beehind.exe"
+                idevicerestore_p.StartInfo.FileName = tempdir + "\libimobiledevice\idevicerestore-w.exe"
             Else
                 idevicerestore_p.StartInfo.FileName = tempdir + "\libimobiledevice\idevicerestore.exe"
             End If
@@ -93,25 +176,36 @@ Public Class Processes
         Loop
     End Sub
 
-    Public Shared Function GetDeviceInfos()
+    Public Shared Function GetDeviceInfos(QueryValue As Boolean, Optional ByVal Value As String = "")
         Dim ideviceinfo_p As New Process()
         Try
             ideviceinfo_p.StartInfo.UseShellExecute = False
             ideviceinfo_p.StartInfo.FileName = tempdir + "\libimobiledevice\ideviceinfo.exe"
+            If QueryValue = True Then
+                ideviceinfo_p.StartInfo.Arguments = "-k " + """" + Value + """"
+            End If
             ideviceinfo_p.StartInfo.CreateNoWindow = True
             ideviceinfo_p.StartInfo.RedirectStandardOutput = True
+            ideviceinfo_p.StartInfo.RedirectStandardError = True
             ideviceinfo_p.Start()
 
         Catch ex As Exception
         End Try
-        ' Do Until ideviceinfo_p.HasExited
-        'Delay(1)
-        'Loop
-        Dim infos As String
+
+        Dim stdout As String = String.Empty
+        Dim stderr As String = String.Empty
+        Dim infos As String = String.Empty
+
         Using oStreamReader As System.IO.StreamReader = ideviceinfo_p.StandardOutput
-            infos = oStreamReader.ReadToEnd()
+            stdout = oStreamReader.ReadToEnd()
         End Using
-        Return infos
+
+        Using oStreamReader As System.IO.StreamReader = ideviceinfo_p.StandardError
+            stderr = oStreamReader.ReadToEnd()
+        End Using
+
+        infos = stdout + stderr
+        Return infos.Trim()
     End Function
 
     Public Shared Sub opensn0w(args As String)
@@ -148,6 +242,21 @@ Public Class Processes
         Catch ex As Exception
         End Try
         Do Until hfsplus_p.HasExited
+            Delay(1)
+        Loop
+    End Sub
+
+    Public Shared Sub bspatch(infile As String, outfile As String, patchfile As String)
+        Dim bspatch_p As New Process()
+        Try
+            bspatch_p.StartInfo.UseShellExecute = False
+            bspatch_p.StartInfo.FileName = tempdir + "\diff.exe"
+            bspatch_p.StartInfo.Arguments = """" + infile + """" + " " + """" + outfile + """" + " " + """" + patchfile + """"
+            bspatch_p.StartInfo.CreateNoWindow = True
+            bspatch_p.Start()
+        Catch ex As Exception
+        End Try
+        Do Until bspatch_p.HasExited
             Delay(1)
         Loop
     End Sub
@@ -209,6 +318,21 @@ Public Class Processes
         Catch ex As Exception
         End Try
         Do Until bplist2xml_p.HasExited
+            Delay(1)
+        Loop
+    End Sub
+
+    Public Shared Sub xml2bplist(args As String)
+        Dim xml2bplist_p As New Process()
+        Try
+            xml2bplist_p.StartInfo.UseShellExecute = False
+            xml2bplist_p.StartInfo.FileName = tempdir + "\xml2bplist.exe"
+            xml2bplist_p.StartInfo.Arguments = args
+            xml2bplist_p.StartInfo.CreateNoWindow = True
+            xml2bplist_p.Start()
+        Catch ex As Exception
+        End Try
+        Do Until xml2bplist_p.HasExited
             Delay(1)
         Loop
     End Sub

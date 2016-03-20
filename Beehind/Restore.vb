@@ -25,13 +25,13 @@ Public Class Restore
         RestoreIPSWPathTextBox.Text = IPSWToRestoreFD.FileName
         RawRestoreConsole.AppendText(Environment.NewLine + "[!] Calculating MD5 Hash of the IPSW")
         Delay(1)
-        IPSWParser(Check_File_MD5(RestoreIPSWPathTextBox.Text))
+        'IPSWParser(Check_File_MD5(RestoreIPSWPathTextBox.Text))
         AddLineToRestoreConsole("    IPSW's MD5 is: " + IPSWMD5)
         AddLineToRestoreConsole("")
         AddLineToRestoreConsole("--------------------")
         AddLineToRestoreConsole("")
         AddLineToRestoreConsole("    Device Type: " + DeviceModel)
-        AddLineToRestoreConsole("    Device's Board ID: " + board_id)
+        AddLineToRestoreConsole("    Device's Board ID: " + DeviceClass)
         AddLineToRestoreConsole("    iOS Version: " + iOS_Version)
         AddLineToRestoreConsole("    iOS Build: " + iOS_Build)
         AddLineToRestoreConsole("")
@@ -39,7 +39,7 @@ Public Class Restore
         AddLineToRestoreConsole("")
         If iOS_Version = "" Then
             AddLineToRestoreConsole("[!] IPSW not recognized, ")
-            Dim UsersChoice As Integer = MessageBox.Show("The IPSW's MD5 hash (" + IPSWMD5 + ") was not in Beehind's database. However it could still be a valid IPSW, or simply,  a Custom Firmware (Unhashable). If you want to continue with the restore, press Yes", "IPSW Unrecognized",
+            Dim UsersChoice As Integer = MessageBox.Show("The IPSW's MD5 hash (" + IPSWMD5 + ") was not in Beehind's database. However it could still be a valid IPSW, or simply, a Custom Firmware (Unhashable). If you want to continue with the restore, press Yes", "IPSW Unrecognized",
                             MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
             If UsersChoice = DialogResult.No Then
                 RawRestoreConsole.AppendText("user stopped the operation")

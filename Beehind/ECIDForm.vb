@@ -25,7 +25,7 @@ Public Class ECIDForm
         RequestBuilder.Close()
         SendTSSRequest(tempdir + "\tss-request.plist", tempdir + "\tss-response.plist")
         XMLPath = tempdir + "\tss-response.plist"
-        FillBlobsSet(iOSAsInteger)
+        FillBlobsSet(iOSAsInteger(iOS_Version))
 
         'writing out apticket
         If APTicket.Length <> 0 Then
@@ -42,8 +42,8 @@ Public Class ECIDForm
     End Sub
 
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel1.LinkClicked
-        Dim deviceinfos As String = GetDeviceInfos()
-        Dim DumpedECID As String = (deviceinfos.Substring(deviceinfos.IndexOf("UniqueChipID") + 13)).Substring(0, (deviceinfos.Substring(deviceinfos.IndexOf("UniqueChipID") + 13)).IndexOf(Environment.NewLine))
+        Dim DumpedECID As String = GetDeviceInfos(True, "UniqueChipID")
+
         If IsNumeric(DumpedECID) Then
             Dim QuestECID As Integer = MessageBox.Show("ECID Dumped: " + DumpedECID + ". Do you want to use it for this downgrade?", "Success!", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
             If QuestECID = DialogResult.Yes Then
@@ -51,7 +51,7 @@ Public Class ECIDForm
                 ECIDConfirmBtn.PerformClick()
             End If
         Else
-            MessageBox.Show("An error has occurred during the ECID dump (" + deviceinfos + "). Make sure you have iTunes 12 or above installed", "Dump failed",
+            MessageBox.Show("An error has occurred during the ECID dump (" + DumpedECID + "). Make sure you have iTunes 12 or above installed", "Dump failed",
                             MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub

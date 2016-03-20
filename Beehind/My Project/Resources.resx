@@ -118,16 +118,154 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="unzip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\unzip.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="WinSCPnet" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\winscpnet.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="sound_completed" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\sound-completed.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="iphone5c_blue" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5c_blue.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone5c_green" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5c_green.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone5c_rose" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5c_rose.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone5c_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5c_white.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone5c_yellow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5c_yellow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone5s_gold" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5s_gold.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone5s_silver" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5s_silver.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone5s_spacegrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5s_spacegrey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone5_black" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5_black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone5_silver" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone5_silver.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone66s_gold" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone66s_gold.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone66s_rosegold" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone66s_rosegold.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone66s_silver" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone66s_silver.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone66s_spacegrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone66s_spacegrey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone6_6s__gold" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone6-6s-_gold.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone6_6s__rosegold" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone6-6s-_rosegold.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone6_6s__silver" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone6-6s-_silver.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone6_6s__spacegrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone6-6s-_spacegrey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lightning_gradient" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lightning-gradient.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="unrar" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\unrar.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="iphone4s_black" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphoe44s_black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone4s_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphoe44s_white.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipod4_black" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipod4_black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipod4_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipod4_white.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_30pin_gradient" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\30pin-gradient.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadpro_gold" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadpro_gold.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadpro_spacegrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadpro_spacegrey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadpro_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadpro_white.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone4_black" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone4_black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone4_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone4_white.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="atv4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\atv4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipad1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipad1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipad234_black" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipad234_black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipad234_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipad234_white.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iphone3gs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iphone3gs.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadmini12_black" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadmini12_black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadmini12_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadmini12_white.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadmini34_silver" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadmini34_silver.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadmini34_spacegrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadmini34_spacegrey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadair1_silver" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadair1_silver.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadair1_spacegrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadair1_spacegrey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadair2_silver" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadair2_silver.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipadair2_spacegrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipadair2_spacegrey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipod5_black" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipod5_black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipod5_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipod5_white.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipod6_spacegrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipod6_spacegrey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ipod6_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ipod6_white.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="beehind_resources" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\beehind-resources.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\beehind-resources.rar;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
